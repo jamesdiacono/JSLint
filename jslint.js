@@ -3392,15 +3392,17 @@ stmt("export", function () {
         advance("default");
         the_thing = expression(0);
         if (
-            the_thing.id !== "("
-            || the_thing.expression[0].id !== "."
-            || the_thing.expression[0].expression.id !== "Object"
-            || the_thing.expression[0].name.id !== "freeze"
+            the_thing.id === "("
+            && the_thing.expression[0].id === "."
+            && the_thing.expression[0].expression.id === "Object"
+            && the_thing.expression[0].name.id === "freeze"
         ) {
-            warn("freeze_exports", the_thing);
-        }
-        if (next_token.id === ";") {
             semicolon();
+        } else {
+            warn("freeze_exports", the_thing);
+            if (next_token.id === ";") {
+                semicolon();
+            }
         }
         exports.default = the_thing;
         the_export.expression.push(the_thing);
