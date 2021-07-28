@@ -1,5 +1,5 @@
 // jslint.js
-// 2020-11-06
+// 2021-07-29
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -1439,6 +1439,7 @@ function tokenize(source) {
                             return expr();
                         }
                     }());
+                    snippet = "";
                     return part();
                 }
             }());
