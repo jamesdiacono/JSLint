@@ -353,16 +353,7 @@ a:active {
                 disallows the file form of the <code>&quot;use
                 strict&quot;</code> pragma. It does not supply
                 <code>self</code>; you will have to request that unnecessary
-                alias of the dreaded global object yourself. It adds the same
-                globals as this directive:
-                <blockquote><code>/*global </code>
-                <div><code>
-                    clearInterval, clearTimeout, document, event, FileReader,
-                    FormData, history, localStorage, location, name, navigator,
-                    screen, sessionStorage, setInterval, setTimeout, Storage,
-                    URL, window, XMLHttpRequest
-                </code></div>
-                <code>*/</code></blockquote>
+                alias of the dreaded global object yourself.
             </td>
         </tr>
         <tr>
@@ -386,6 +377,12 @@ a:active {
     <code> */</code></blockquote></td>
         </tr>
         <tr>
+            <td id="deno">Assume <a href="https://deno.land/">Deno</a></td>
+            <td><code>deno</code></td>
+            <td><code>true</code> if Deno globals should be predefined.
+            </td>
+        </tr>
+        <tr>
             <td id="devel">Assume in development</td>
             <td><code>devel</code></td>
             <td><code>true</code> if browser globals that are useful in
@@ -406,7 +403,7 @@ a:active {
                 feature of the language.</td>
         </tr>
         <tr>
-            <td>Tolerate <code>for</code> statement</td>
+            <td id="for">Tolerate <code>for</code> statement</td>
             <td><code>for</code></td>
             <td><code>true</code> if the <code>for</code> statement should be
                 allowed. It is almost always better to use the array methods
@@ -423,7 +420,7 @@ a:active {
                 in its reports.</td>
         </tr>
         <tr>
-            <td id="fudge">Tolerate <code>get</code> and <code>set</code></td>
+            <td id="getset">Tolerate <code>get</code> and <code>set</code></td>
             <td><code>getset</code></td>
             <td><code>true</code> if accessor properties are allowed in object literals.</td>
         </tr>
@@ -435,16 +432,8 @@ a:active {
         <tr>
             <td id="node">Assume <a href="http://nodejs.org/">Node.js</a></td>
             <td><code>node</code></td>
-            <td><code>true</code> if Node.js globals should be predefined. It
-                will predefine globals that are used in the Node.js environment.
-                It adds the same globals as this directive:
-                <blockquote><code>/*global </code>
-    <div><code>
-        Buffer, clearImmediate, clearInterval, clearTimeout, console, exports,
-        module, process, require, setImmediate, setInterval, setTimeout, URL,
-        URLSearchParams, __dirname, __filename
-</code></div>
-    <code>*/</code></blockquote></td>
+            <td><code>true</code> if Node.js globals should be predefined.
+            </td>
         </tr>
         <tr>
             <td id="single">Tolerate single quote strings</td>
@@ -453,7 +442,7 @@ a:active {
                 should be allowed to enclose string literals. </td>
         </tr>
         <tr>
-            <td>Tolerate <code>this</code><br></td>
+            <td id="this">Tolerate <code>this</code><br></td>
             <td><code>this</code></td>
             <td><code>true</code> if <code>this</code> should be allowed. </td>
         </tr>
