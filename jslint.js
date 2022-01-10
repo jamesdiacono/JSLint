@@ -1,5 +1,5 @@
 // jslint.js
-// 2022-01-04
+// 2022-01-10
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -3966,6 +3966,7 @@ function lookup(thing) {
 }
 
 function subactivate(name) {
+    walk_expression(name.expression);
     name.init = true;
     name.dead = false;
     blockage.live.push(name);
@@ -4036,11 +4037,7 @@ function activate(name) {
     name.dead = false;
     if (name.expression !== undefined) {
         walk_expression(name.expression);
-        if (name.id === "{" || name.id === "[") {
-            name.names.forEach(subactivate);
-        } else {
-            name.init = true;
-        }
+        name.init = true;
     }
     blockage.live.push(name);
 }
@@ -4999,7 +4996,7 @@ export default Object.freeze(function jslint(
     }
     return {
         directives,
-        edition: "2020-11-06",
+        edition: "2020-01-10",
         exports,
         froms,
         functions,
