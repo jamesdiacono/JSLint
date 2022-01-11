@@ -1,5 +1,5 @@
 // jslint.js
-// 2022-01-10
+// 2022-01-11
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -2768,15 +2768,6 @@ function parameter_list() {
                     survey(subparam);
                     advance();
                     signature.push(subparam.id);
-                    if (next_token.id === ":") {
-                        advance(":");
-                        advance();
-                        token.label = subparam;
-                        subparam = token;
-                        if (!subparam.identifier) {
-                            return stop("expected_identifier_a");
-                        }
-                    }
                     if (next_token.id === "=") {
                         advance("=");
                         subparam.expression = expression();
@@ -3232,20 +3223,8 @@ function do_var() {
                 const name = next_token;
                 survey(name);
                 advance();
-                if (next_token.id === ":") {
-                    advance(":");
-                    if (!next_token.identifier) {
-                        return stop("expected_identifier_a", next_token);
-                    }
-                    next_token.label = name;
-                    the_statement.names.push(next_token);
-                    enroll(next_token, "variable", is_const);
-                    advance();
-                    the_brace.open = true;
-                } else {
-                    the_statement.names.push(name);
-                    enroll(name, "variable", is_const);
-                }
+                the_statement.names.push(name);
+                enroll(name, "variable", is_const);
                 name.dead = false;
                 name.init = true;
                 if (next_token.id === "=") {
@@ -4996,7 +4975,7 @@ export default Object.freeze(function jslint(
     }
     return {
         directives,
-        edition: "2020-01-10",
+        edition: "2020-01-11",
         exports,
         froms,
         functions,
