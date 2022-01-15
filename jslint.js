@@ -1,5 +1,5 @@
 // jslint.js
-// 2022-01-11
+// 2022-01-15
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -88,10 +88,10 @@
 /*property
     a, and, arity, assign, b, bad_assignment_a, bad_directive_a, bad_get,
     bad_module_name_a, bad_option_a, bad_property_a, bad_set, bitwise, block,
-    body, browser, c, calls, catch, charCodeAt, closer, closure, code, column,
-    concat, constant, context, convert, couch, create, d, dead, default, deno,
-    devel, directive, directives, disrupt, dot, duplicate_a, edition, ellipsis,
-    else, empty_block, eval, every, expected_a, expected_a_at_b_c, expected_a_b,
+    body, browser, c, calls, catch, closer, closure, code, column, concat,
+    constant, context, convert, couch, create, d, dead, default, deno, devel,
+    directive, directives, disrupt, dot, duplicate_a, edition, ellipsis, else,
+    empty_block, eval, every, expected_a, expected_a_at_b_c, expected_a_b,
     expected_a_b_from_c_d, expected_a_before_b, expected_a_next_at_b,
     expected_digits_after_a, expected_four_digits, expected_identifier_a,
     expected_line_break_a_b, expected_regexp_factor_a, expected_space_a_b,
@@ -106,16 +106,16 @@
     number_isNaN, ok, open, opening, option, out_of_scope_a, parameters, parent,
     pop, property, push, quote, raw, redefinition_a_b, replace,
     required_a_optional_b, reserved_a, role, search, shebang, signature, single,
-    slice, some, sort, split, startsWith, statement, stop, subscript_a, switch,
-    test, this, thru, toString, todo_comment, tokens, too_long, too_many_digits,
-    tree, try, type, u, unclosed_comment, unclosed_mega, unclosed_string,
-    undeclared_a, unexpected_a, unexpected_a_after_b, unexpected_a_before_b,
+    slice, sort, split, startsWith, statement, stop, subscript_a, test, this,
+    thru, todo_comment, tokens, too_long, too_many_digits, tree, try, type, u,
+    unclosed_comment, unclosed_mega, unclosed_string, undeclared_a,
+    unexpected_a, unexpected_a_after_b, unexpected_a_before_b,
     unexpected_at_top_level_a, unexpected_char_a, unexpected_comment,
     unexpected_directive_a, unexpected_expression_a, unexpected_label_a,
     unexpected_parens, unexpected_space_a_b, unexpected_statement_a,
     unexpected_trailing_space, unexpected_typeof_a, uninitialized_a,
     unreachable_a, unregistered_property_a, unused_a, use_double, use_open,
-    use_spaces, used, value, var_loop, var_switch, variable, warning, warnings,
+    use_spaces, used, value, var_loop, variable, warning, warnings,
     weird_condition_a, weird_expression_a, weird_loop, weird_relation_a, white,
     wrap_condition, wrap_immediate, wrap_parameter, wrap_regexp, wrap_unary,
     wrapped, writable, y
@@ -342,7 +342,6 @@ const bundle = {
     ),
     use_spaces: "Use spaces, not tabs.",
     var_loop: "Don't declare variables in a loop.",
-    var_switch: "Don't declare variables in a switch.",
     weird_condition_a: "Weird condition '{a}'.",
     weird_expression_a: "Weird expression '{a}'.",
     weird_loop: "Weird loop.",
@@ -1579,7 +1578,7 @@ function tokenize(source) {
 //      name        identifier
 //      expression  expressions
 //      block       statements
-//      else        statements (else, default, catch)
+//      else        statements (else, catch)
 
 // Specialized tokens may have additional properties.
 
@@ -2049,7 +2048,6 @@ function statement() {
         if (
             next_token.id === "do"
             || next_token.id === "for"
-            || next_token.id === "switch"
             || next_token.id === "while"
         ) {
             enroll(the_label, "label", true);
@@ -2098,8 +2096,6 @@ function statements() {
     (function next(disrupt) {
         if (
             next_token.id !== "}"
-            && next_token.id !== "case"
-            && next_token.id !== "default"
             && next_token.id !== "else"
             && next_token.id !== "(end)"
         ) {
@@ -2431,6 +2427,7 @@ symbol("protected");
 symbol("public");
 symbol("static");
 symbol("super");
+symbol("switch");
 symbol("void");
 symbol("yield");
 
@@ -2922,12 +2919,11 @@ function do_function(the_function) {
     }
 
 // Give the function properties for storing its names and for observing the
-// depth of loops and switches.
+// depth of loops.
 
     the_function.context = empty();
     the_function.finally = 0;
     the_function.loop = 0;
-    the_function.switch = 0;
     the_function.try = 0;
 
 // Push the current function context and establish a new one.
@@ -2993,12 +2989,11 @@ function fart(pl) {
     }
 
 // Give the function properties storing its names and for observing the depth
-// of loops and switches.
+// of loops.
 
     the_fart.context = empty();
     the_fart.finally = 0;
     the_fart.loop = 0;
-    the_fart.switch = 0;
     the_fart.try = 0;
 
 // Push the current function context and establish a new one.
@@ -3155,10 +3150,7 @@ stmt("{", function () {
 stmt("break", function () {
     const the_break = token;
     let the_label;
-    if (
-        (functionage.loop < 1 && functionage.switch < 1)
-        || functionage.finally > 0
-    ) {
+    if (functionage.loop < 1 || functionage.finally > 0) {
         warn("unexpected_a", the_break);
     }
     the_break.disrupt = true;
@@ -3204,11 +3196,8 @@ function do_var() {
         }
     }
 
-// We don't expect to see variables created in switch statements.
+// We don't expect to see vars created in loops.
 
-    if (functionage.switch > 0) {
-        warn("var_switch", the_statement);
-    }
     if (functionage.loop > 0 && the_statement.id === "var") {
         warn("var_loop", the_statement);
     }
@@ -3583,92 +3572,7 @@ stmt("return", function () {
     return the_return;
 });
 stmt("switch", function () {
-    let dups = [];
-    let last;
-    let stmts;
-    const the_cases = [];
-    let the_disrupt = true;
-    const the_switch = token;
-    not_top_level(the_switch);
-    if (functionage.finally > 0) {
-        warn("unexpected_a", the_switch);
-    }
-    functionage.switch += 1;
-    advance("(");
-    token.free = true;
-    the_switch.expression = expression(0);
-    the_switch.block = the_cases;
-    advance(")");
-    advance("{");
-    (function major() {
-        const the_case = next_token;
-        the_case.arity = "statement";
-        the_case.expression = [];
-        (function minor() {
-            advance("case");
-            token.switch = true;
-            const exp = expression(0);
-            if (dups.some(function (thing) {
-                return are_similar(thing, exp);
-            })) {
-                warn("unexpected_a", exp);
-            }
-            dups.push(exp);
-            the_case.expression.push(exp);
-            advance(":");
-            if (next_token.id === "case") {
-                return minor();
-            }
-        }());
-        stmts = statements();
-        if (stmts.length < 1) {
-            warn("expected_statements_a");
-            return;
-        }
-        the_case.block = stmts;
-        the_cases.push(the_case);
-        last = stmts[stmts.length - 1];
-        if (last.disrupt) {
-            if (last.id === "break" && last.label === undefined) {
-                the_disrupt = false;
-            }
-        } else {
-            warn(
-                "expected_a_before_b",
-                next_token,
-                "break;",
-                artifact(next_token)
-            );
-        }
-        if (next_token.id === "case") {
-            return major();
-        }
-    }());
-    dups = undefined;
-    if (next_token.id === "default") {
-        const the_default = next_token;
-        advance("default");
-        token.switch = true;
-        advance(":");
-        the_switch.else = statements();
-        if (the_switch.else.length < 1) {
-            warn("unexpected_a", the_default);
-            the_disrupt = false;
-        } else {
-            const the_last = the_switch.else[the_switch.else.length - 1];
-            if (the_last.id === "break" && the_last.label === undefined) {
-                warn("unexpected_a", the_last);
-                the_last.disrupt = false;
-            }
-            the_disrupt = the_disrupt && the_last.disrupt;
-        }
-    } else {
-        the_disrupt = false;
-    }
-    advance("}", the_switch);
-    functionage.switch -= 1;
-    the_switch.disrupt = the_disrupt;
-    return the_switch;
+    stop("unexpected_a", token);
 });
 stmt("throw", function () {
     const the_throw = token;
@@ -4217,7 +4121,6 @@ postaction("assignment", function (thing) {
 function postaction_function(thing) {
     delete functionage.finally;
     delete functionage.loop;
-    delete functionage.switch;
     delete functionage.try;
     functionage = stack.pop();
     if (thing.wrapped) {
@@ -4695,8 +4598,6 @@ function whitage() {
                             if (right.from !== 0) {
                                 expected_at(0);
                             }
-                        } else if (right.switch) {
-                            at_margin(-4);
                         } else {
                             at_margin(0);
                         }
@@ -4750,9 +4651,7 @@ function whitage() {
 // If left is ',' or ';' or right is a statement then if open,
 // right must go at the margin, or if closed, a space between.
 
-                    if (right.switch) {
-                        at_margin(-4);
-                    } else if (right.role === "label") {
+                    if (right.role === "label") {
                         if (right.from !== 0) {
                             expected_at(0);
                         }
@@ -4898,7 +4797,6 @@ export default Object.freeze(function jslint(
             line: 0,
             live: [],
             loop: 0,
-            switch: 0,
             thru: 0
         };
         blockage = global;
@@ -4975,7 +4873,7 @@ export default Object.freeze(function jslint(
     }
     return {
         directives,
-        edition: "2020-01-11",
+        edition: "2020-01-15",
         exports,
         froms,
         functions,

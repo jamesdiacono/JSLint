@@ -525,9 +525,8 @@ a:active {
     on it unless you are a beginner.</p>
 <p>JSLint expects that every statement will be followed by
     <code>;</code> except for <code>for</code>, <code>function</code>,
-    <code>if</code>, <code>switch</code>, <code>try</code>, and
-    <code>while</code>. JSLint does not expect to see unnecessary
-    semicolons, the empty statement, or empty blocks.</p>
+    <code>if</code>, <code>try</code>, and <code>while</code>. JSLint does not
+    expect to see unnecessary semicolons, the empty statement, or empty blocks.</p>
 <h1 id=function><code>function =></code></h1>
 <p>JavaScript has four syntactic forms for making function objects: function
     statements, function expressions, enhanced object literals, and the
@@ -567,9 +566,9 @@ a:active {
     comma should not appear after the last element of an array literal or object
     literal.</p>
 <h1 id=blocks>Blocks</h1>
-<p>JSLint expects blocks with <code>function</code>,
-    <code>if</code>, <code>switch</code>, <code>while</code>, <code>for</code>,
-    <code>do</code>, and <code>try</code> statements and nowhere else.</p>
+<p>JSLint expects blocks with <code>function</code>, <code>if</code>,
+    <code>while</code>, <code>for</code>, <code>do</code>, and <code>try</code>
+    statements and nowhere else.</p>
 <p>JSLint expects that <code>if</code>, <code>while</code>,
     <code>do</code> and <code>for</code> statements will be made with blocks
     <code>{</code>that is, with statements enclosed in braces<code>}</code>.</p>
@@ -613,11 +612,31 @@ a:active {
 <p>Note that the above code will fail if the object contains a property
     named <code>hasOwnProperty</code>. Use <code>Object.keys</code> instead.</p>
 <h1 id=switch><code>switch</code></h1>
-<p>A common error in <code>switch</code> statements is to forget to place a
-    <code>break</code> statement after each case, resulting in unintended
-    fall-through. JSLint expects that the statement before the next
-    <code>case</code> or <code>default</code> is one of these:
-    <code>break</code>, <code>return</code>, or <code>throw</code>.</p>
+<p>The <code>switch</code> statement suffers from a fall thru hazard, as well as a
+    bizarre syntax. Fortunately, there are better alternatives. The
+    <code>if</code> statement has the <code>else if</code> form which is more
+    regular and more compact than the <code>switch</code> statement.</p>
+<pre>if (<i>variable</i> === <i>case_a</i>) {
+    <i>statements;</i>
+} else if (<i>variable</i> === <i>case_b</i>) {
+    <i>statements;</i>
+} else {
+    <i>statements;</i>
+}</pre>
+    <p>Alternatively, an object can be filled with functions representing the
+    different cases.</p>
+<pre>const cases = {
+    <i>case_a</i>() {
+        <i>statements;</i>
+    },
+    <i>case_b</i>() {
+        <i>statements;</i>
+    }
+};
+cases[<i>variable</i>]();</pre>
+    <p>If none of the functions are matched, an exception gets raised
+    automatically.</p>
+    <p>JSLint does not expect to see a <code>switch</code> statement.</p>
 <h1 id=with><code>with</code></h1>
 <p>The <code>with</code> statement was intended to provide a shorthand in
     accessing properties in deeply nested objects. Unfortunately, it behaves
@@ -628,14 +647,13 @@ a:active {
 <p>JavaScript allows any statement to have a label, and labels have a
     separate name space. JSLint is more strict.</p>
 <p>JSLint expects labels only on statements that interact
-    with <code>break</code>: <code>switch</code>, <code>while</code>,
-    <code>do</code>, and <code>for</code>. JSLint expects that
-    labels will be distinct from vars and parameters.</p>
+    with <code>break</code>: <code>while</code>, <code>do</code>, and
+    <code>for</code>. JSLint expects that labels will be distinct from vars and
+    parameters.</p>
 <h1 id=unreachable>Unreachable Code</h1>
 <p>JSLint expects that a <code>return</code>, <code>break</code>,
     or <code>throw</code> statement will be followed by a
-    <code>}</code>&nbsp;<small>right brace</small> or <code>case</code> or
-    <code>default</code>.</p>
+    <code>}</code>&nbsp;<small>right brace</small>.</p>
 <h1 id=pluses>Confusing Pluses and Minuses</h1>
 <p>JSLint expects that <code>+</code> will not be followed by
     <code>+</code> or <code>++</code>, and that <code>-</code> will not be
@@ -712,9 +730,8 @@ a:active {
     : the_token.id
 );</pre>
 <p>The word <code>function</code> is always followed with one space.</p>
-<p>Clauses (<code>case</code>, <code>catch</code>, <code>default</code>,
-    <code>else</code>, <code>finally</code>) are not statements and so should
-    not be indented like statements.</p>
+<p>Clauses (<code>catch</code>, <code>else</code> and <code>finally</code>) are
+    not statements and so should not be indented like statements.</p>
 <p>Spaces are used to make things that are not invocations look less like
     invocations.</p>
 <p>Tabs and spaces should not be mixed. We should pick just one in order to
