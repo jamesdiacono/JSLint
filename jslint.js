@@ -1,5 +1,5 @@
 // jslint.js
-// 2022-01-15
+// 2022-01-28
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -65,18 +65,18 @@
 
 // jslint works in several phases. In any of these phases, errors might be
 // found. Sometimes JSLint is able to recover from an error and continue
-// parsing. In some cases, it cannot and will stop early. If that should happen,
-// repair your code and try again.
+// parsing. In some cases, it can not and will stop early. If that should
+// happen, repair your code and try again.
 
 // Phases:
 
-//      1. If the source is a single string, split it into an array of strings.
-//      2. Turn the source into an array of tokens.
-//      3. Furcate the tokens into a parse tree.
-//      4. Walk the tree, traversing all of the nodes of the tree. It is a
+//      0. If the source is a single string, split it into an array of strings.
+//      1. Turn the source into an array of tokens.
+//      2. Furcate the tokens into a parse tree.
+//      3. Walk the tree, traversing all of the nodes of the tree. It is a
 //          recursive traversal. Each node may be processed on the way down
 //          (preaction) and on the way up (postaction).
-//      5. Check the whitespace between the tokens.
+//      4. Check the whitespace between the tokens.
 
 // jslint can also examine JSON text. It decides that a file is JSON text if
 // the first token is "[" or "{". Processing of JSON text is much simpler than
@@ -103,8 +103,8 @@
     level, line, lines, live, long, loop, m, margin, match, message,
     misplaced_a, misplaced_directive_a, missing_browser, missing_m, module,
     naked_block, name, names, nested_comment, new, node, not_label_a, nr, nud,
-    number_isNaN, ok, open, opening, option, out_of_scope_a, parameters, parent,
-    pop, property, push, quote, raw, redefinition_a_b, replace,
+    null, number_isNaN, ok, open, opening, option, out_of_scope_a, parameters,
+    parent, pop, property, push, quote, raw, redefinition_a_b, replace,
     required_a_optional_b, reserved_a, role, search, shebang, signature, single,
     slice, sort, split, startsWith, statement, stop, subscript_a, test, this,
     thru, todo_comment, tokens, too_long, too_many_digits, tree, try, type, u,
@@ -182,6 +182,7 @@ const allowed_option = {
         "setImmediate", "setInterval", "setTimeout", "TextDecoder",
         "TextEncoder", "URL", "URLSearchParams", "__dirname", "__filename"
     ],
+    null: true,
     single: true,
     this: true,
     white: true
@@ -370,7 +371,6 @@ const rx_crlf = tag_regexp `
       \n
     | \r \n?
 `;
-// identifier
 const rx_identifier = tag_regexp ` ^(
     [ a-z A-Z _ $ ]
     [ a-z A-Z 0-9 _ $ ]*
@@ -382,9 +382,7 @@ const rx_bad_property = tag_regexp `
   | Sync $
   | _ $
 `;
-// star slash
 const rx_star_slash = tag_regexp ` \* \/ `;
-// slash star
 const rx_slash_star = tag_regexp ` \/ \* `;
 // slash star or ending slash
 const rx_slash_star_or_slash = tag_regexp ` \/ \* | \/ $ `;
@@ -394,9 +392,7 @@ const rx_todo = tag_regexp ` \b (?:
   | TO \s? DO
   | HACK
 ) \b `;
-// tab
 const rx_tab = /\t/g;
-// directive
 const rx_directive = tag_regexp ` ^ (
     jslint
   | property
@@ -407,7 +403,6 @@ const rx_directive_part = tag_regexp ` ^ (
 ) (?:
     : \s* ( true | false )
 )? ,? \s* ( .* ) $ `;
-// token
 const rx_token = tag_regexp ` ^ (
     (\s+)
   | (
@@ -416,7 +411,7 @@ const rx_token = tag_regexp ` ^ (
     )
   | [
       ( ) { } \[ \] , : ; ' " ~ \`
-  ]
+    ]
   | \? [ ? . ]?
   | = (?:
         = =?
@@ -445,17 +440,14 @@ const rx_digits = /^[0-9]*/;
 const rx_hexs = /^[0-9A-F]*/i;
 const rx_octals = /^[0-7]*/;
 const rx_bits = /^[01]*/;
-// mega
 const rx_mega = /[`\\]|\$\{/;
-// JSON number
 const rx_JSON_number = tag_regexp ` ^
     -?
     (?: 0 | [ 1-9 ] \d* )
     (?: \. \d* )?
     (?: [ e E ] [ \- + ]? \d+ )?
 $ `;
-// initial cap
-const rx_cap = /^[A-Z]/;
+const rx_initial_cap = /^[A-Z]/;
 
 function is_letter(string) {
     return (
@@ -481,10 +473,10 @@ let block_stack;        // The stack of blocks.
 let declared_globals;   // The object containing the global declarations.
 let directives;         // The directive comments.
 let directive_mode;     // true if directives are still allowed.
-let early_stop;         // true if JSLint cannot finish.
+let early_stop;         // true if JSLint can not finish.
 let exports;            // The exported names and values.
-let froms;              // The array collecting all import-from strings.
-let fudge;              // true if the natural numbers start with 1.
+let froms;              // The array collecting all import specifier strings.
+let fudge;              // The first natural number: 0 or 1.
 let functionage;        // The current function.
 let functions;          // The array containing all of the functions.
 let global;             // The global object; the outermost context.
@@ -547,7 +539,7 @@ function warn_at(code, line, column, a, b, c, d) {
 // Report an error at some line and column of the program. The warning object
 // resembles an exception.
 
-    const warning = {         // ~~
+    const warning = {
         name: "JSLintError",
         column,
         line,
@@ -695,7 +687,7 @@ function tokenize(source) {
     }
 
 // Most tokens, including the identifiers, operators, and punctuators, can be
-// found with a regular expression. Regular expressions cannot correctly match
+// found with a regular expression. Regular expressions can not correctly match
 // regular expression literals, so we will match those the hard way. String
 // literals and number literals can be matched by regular expressions, but they
 // don't provide good warnings. The functions snip, next_char, back_char,
@@ -1508,7 +1500,7 @@ function tokenize(source) {
 // The / can be a division operator or the beginning of a regular expression
 // literal. It is not possible to know which without doing a complete parse.
 // We want to complete the tokenization before we begin to parse, so we will
-// estimate. This estimator can fail in some cases. For example, it cannot
+// estimate. This estimator can fail in some cases. For example, it can not
 // know if "}" is ending a block or ending an object literal, so it can
 // behave incorrectly in that case; it is not meaningful to divide an
 // object, so it is likely that we can get away with it. We avoided the worst
@@ -2242,7 +2234,7 @@ function assignment(id) {
 // Make an assignment operator. The one true assignment is different because
 // its left side, when it is a variable, is not treated as an expression.
 // That case is special because that is when a variable gets initialized. The
-// other assignment operators can modify, but they cannot initialize.
+// other assignment operators can modify, but they can not initialize.
 
     const the_symbol = symbol(id, 20);
     the_symbol.led = function (left) {
@@ -2469,7 +2461,22 @@ constant("isNaN", "function", function () {
     return token;
 });
 constant("NaN", "number", NaN);
-constant("null", "null", null);
+constant("null", "null", function () {
+    const previous_token = tokens[tokens.indexOf(token) - 1];
+    if (
+        !option.null
+        && previous_token !== undefined
+        && (
+            previous_token.id !== "("
+            || previous_token.expression[0].id !== "."
+            || previous_token.expression[0].expression.id !== "Object"
+            || previous_token.expression[0].name.id !== "create"
+        )
+    ) {
+        warn("unexpected_a", token);
+    }
+    return token;
+});
 constant("this", "object", function () {
     if (!option.this) {
         warn("unexpected_a", token);
@@ -4262,7 +4269,7 @@ postaction("binary", "(", function (thing) {
         if (left.expression.id === "Date" && left.name.id === "UTC") {
             cack = !cack;
         }
-        if (rx_cap.test(left.name.id) !== cack) {
+        if (rx_initial_cap.test(left.name.id) !== cack) {
             if (the_new !== undefined) {
                 warn("unexpected_a", the_new);
             } else {
@@ -4873,7 +4880,7 @@ export default Object.freeze(function jslint(
     }
     return {
         directives,
-        edition: "2020-01-15",
+        edition: "2022-01-28",
         exports,
         froms,
         functions,
