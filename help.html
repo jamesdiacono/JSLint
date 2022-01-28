@@ -404,13 +404,6 @@ a:active {
                 feature of the language.</td>
         </tr>
         <tr>
-            <td id="for">Tolerate <code>for</code> statement</td>
-            <td><code>for</code></td>
-            <td><code>true</code> if the <code>for</code> statement should be
-                allowed. It is almost always better to use the array methods
-                instead.</td>
-        </tr>
-        <tr>
             <td id="fudge">Fudge the line and column numbers</td>
             <td><code>fudge</code></td>
             <td><code>true</code> if the origin of a text file is line 1 column
@@ -477,7 +470,7 @@ a:active {
     the bottom of its report, JSLint displays a
     <code>/*property*/</code> directive. It contains all of the names that were
     used with dot notation, subscript notation, and object literals to name the
-    properties of objects. You can look through the list for misspellings. You
+    properties of objects. You can look thru the list for misspellings. You
     can copy the <code>/*property*/</code></code> directive to the top of your
     script file. JSLint will check the spelling of all property
     names against the list. That way, you can have JSLint look for
@@ -531,10 +524,10 @@ a:active {
     work very well. Automatic semicolon insertion was added to make
     things easier for beginners. Unfortunately, it sometimes fails. Do not rely
     on it unless you are a beginner.</p>
-<p>JSLint expects that every statement will be followed by
-    <code>;</code> except for <code>for</code>, <code>function</code>,
-    <code>if</code>, <code>try</code>, and <code>while</code>. JSLint does not
-    expect to see unnecessary semicolons, the empty statement, or empty blocks.</p>
+<p>JSLint expects that every statement will be followed by <code>;</code> except
+    for <code>function</code>, <code>if</code>, <code>try</code>, and
+    <code>while</code>. JSLint does not expect to see unnecessary semicolons,
+    the empty statement, or empty blocks.</p>
 <h1 id=function><code>function =></code></h1>
 <p>JavaScript has four syntactic forms for making function objects: function
     statements, function expressions, enhanced object literals, and the
@@ -575,10 +568,10 @@ a:active {
     literal.</p>
 <h1 id=blocks>Blocks</h1>
 <p>JSLint expects blocks with <code>function</code>, <code>if</code>,
-    <code>while</code>, <code>for</code>, <code>do</code>, and <code>try</code>
+    <code>while</code>, <code>do</code>, and <code>try</code>
     statements and nowhere else.</p>
-<p>JSLint expects that <code>if</code>, <code>while</code>,
-    <code>do</code> and <code>for</code> statements will be made with blocks
+<p>JSLint expects that <code>if</code>, <code>while</code> and <code>do</code>
+    statements will be made with blocks
     <code>{</code>that is, with statements enclosed in braces<code>}</code>.</p>
 <p>JavaScript allows an <code>if</code> to be written like this:</p>
 <pre>if (<var>condition</var><code>)
@@ -595,30 +588,30 @@ a:active {
     call. All other expression statements are considered
     to be errors.</p>
 <h1 id=for><code>for</code></h1>
-<p>JSLint does not recommend use of the <code>for</code> statement.
-    Use array methods like <code>forEach</code> instead. The <code>for</code>
-    option will suppress some warnings. The forms of <code>for</code> that
-    JSLint accepts are restricted, excluding the new ES6 forms.</p>
-<h1 id=forin><code>for</code> <code>in</code></h1>
-<p>JSLint does not recommend use of the <code>for</code>
-    <code>in</code> statement. Use <code>Object.keys</code> instead.</p>
-<p>The <code>for</code> <code>in</code> statement allows for looping through
-    the names of all of the properties of an object. Unfortunately, it also
-    loops through all of the properties that were inherited through the
-    prototype chain. This has the bad side effect of serving up method
-    functions when the interest is in data properties. If a program is written
-    without awareness of this situation, then it can fail.</p>
-<p>The body of every <code>for</code> <code>in</code> statement should be
-    wrapped in an <code>if</code> statement that does filtering. It can select
-    for a particular type or range of values, or it can exclude functions,
-    or it can exclude properties from the prototype. For example,</p>
-<pre>for (name in object) {
-    if (object.hasOwnProperty(name)) {
-        ....
-    }
+<p>Iterating thru arrays is best achieved using the array methods, such as
+    <code>forEach</code>, which handle the induction variable for you. This
+    eliminates the potential for a whole class of errors.</p>
+<p>For all other kinds of iteration, use a tail recursive function, a
+    <code>while</code> loop or a <code>do</code> loop. These alternatives avoid
+    the <code>for</code> loop's overly compacted syntax</p>
+<pre>for (<var>initialization</var>; <var>condition</var>; <var>increment</var>) {
+    // do some work
 }</pre>
-<p>Note that the above code will fail if the object contains a property
-    named <code>hasOwnProperty</code>. Use <code>Object.keys</code> instead.</p>
+<p>yet do exactly the same thing:</p>
+<pre><var>initialization</var>;
+while (<var>condition</var>) {
+    // do some work
+    <var>increment</var>;
+}</pre>
+<p>In fact, they are strictly more powerful, because the condition check can be
+    moved anywhere within the block.</p>
+<p>The <code>for</code> <code>in</code> statement loops thru
+    the names of all of the properties of an object. Unfortunately, it also
+    loops thru all of the properties that were inherited from the
+    prototype chain. This has the bad side effect of serving up method
+    functions when the interest is in data properties. Use
+    <code>Object.keys</code> instead.</p>
+<p>JSLint does not expect to see a <code>for</code> statement.</p>
 <h1 id="null"><code>null</code></h1>
 <p>JSLint does not recommend the use of <code>null</code>, except in
     <code>Object.create(null)</code>. Use <code>undefined</code> instead.</p>
@@ -666,10 +659,9 @@ cases[<var>variable</var>]();</pre>
 <h1 id=labels>Labels</h1>
 <p>JavaScript allows any statement to have a label, and labels have a
     separate name space. JSLint is more strict.</p>
-<p>JSLint expects labels only on statements that interact
-    with <code>break</code>: <code>while</code>, <code>do</code>, and
-    <code>for</code>. JSLint expects that labels will be distinct from vars and
-    parameters.</p>
+<p>JSLint expects labels only on statements that interact with
+    <code>break</code>: <code>while</code> and <code>do</code>. JSLint expects
+    that labels will be distinct from vars and parameters.</p>
 <h1 id=unreachable>Unreachable Code</h1>
 <p>JSLint expects that a <code>return</code>, <code>break</code>,
     or <code>throw</code> statement will be followed by a

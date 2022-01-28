@@ -96,29 +96,29 @@
     expected_digits_after_a, expected_four_digits, expected_identifier_a,
     expected_line_break_a_b, expected_regexp_factor_a, expected_space_a_b,
     expected_statements_a, expected_string_a, expected_type_string_a, exports,
-    expression, extra, finally, flag, for, forEach, free, freeze,
-    freeze_exports, from, froms, fud, fudge, function_in_loop, functions, g,
-    getset, global, i, id, identifier, import, inc, indexOf, infix_in, init,
-    initial, isArray, isNaN, join, json, keys, label, label_a, lbp, led, length,
-    level, line, lines, live, long, loop, m, margin, match, message,
-    misplaced_a, misplaced_directive_a, missing_browser, missing_m, module,
-    naked_block, name, names, nested_comment, new, node, not_label_a, nr, nud,
-    null, number_isNaN, ok, open, opening, option, out_of_scope_a, parameters,
-    parent, pop, property, push, quote, raw, redefinition_a_b, replace,
-    required_a_optional_b, reserved_a, role, search, shebang, signature, single,
-    slice, sort, split, startsWith, statement, stop, subscript_a, test, this,
-    thru, todo_comment, tokens, too_long, too_many_digits, tree, try, type, u,
-    unclosed_comment, unclosed_mega, unclosed_string, undeclared_a,
-    unexpected_a, unexpected_a_after_b, unexpected_a_before_b,
-    unexpected_at_top_level_a, unexpected_char_a, unexpected_comment,
-    unexpected_directive_a, unexpected_expression_a, unexpected_label_a,
-    unexpected_parens, unexpected_space_a_b, unexpected_statement_a,
-    unexpected_trailing_space, unexpected_typeof_a, uninitialized_a,
-    unreachable_a, unregistered_property_a, unused_a, use_double, use_open,
-    use_spaces, used, value, var_loop, variable, warning, warnings,
-    weird_condition_a, weird_expression_a, weird_loop, weird_relation_a, white,
-    wrap_condition, wrap_immediate, wrap_parameter, wrap_regexp, wrap_unary,
-    wrapped, writable, y
+    expression, extra, finally, flag, forEach, free, freeze, freeze_exports,
+    from, froms, fud, fudge, function_in_loop, functions, g, getset, global, i,
+    id, identifier, import, indexOf, infix_in, init, isArray, isNaN, join, json,
+    keys, label, label_a, lbp, led, length, level, line, lines, live, long,
+    loop, m, margin, match, message, misplaced_a, misplaced_directive_a,
+    missing_browser, missing_m, module, naked_block, name, names,
+    nested_comment, new, node, not_label_a, nr, nud, null, number_isNaN, ok,
+    open, opening, option, out_of_scope_a, parameters, parent, pop, property,
+    push, quote, raw, redefinition_a_b, replace, required_a_optional_b,
+    reserved_a, role, search, shebang, signature, single, slice, sort, split,
+    startsWith, statement, stop, subscript_a, test, this, thru, todo_comment,
+    tokens, too_long, too_many_digits, tree, try, type, u, unclosed_comment,
+    unclosed_mega, unclosed_string, undeclared_a, unexpected_a,
+    unexpected_a_after_b, unexpected_a_before_b, unexpected_at_top_level_a,
+    unexpected_char_a, unexpected_comment, unexpected_directive_a,
+    unexpected_expression_a, unexpected_label_a, unexpected_parens,
+    unexpected_space_a_b, unexpected_statement_a, unexpected_trailing_space,
+    unexpected_typeof_a, uninitialized_a, unreachable_a,
+    unregistered_property_a, unused_a, use_double, use_open, use_spaces, used,
+    value, var_loop, variable, warning, warnings, weird_condition_a,
+    weird_expression_a, weird_loop, weird_relation_a, white, wrap_condition,
+    wrap_immediate, wrap_parameter, wrap_regexp, wrap_unary, wrapped, writable,
+    y
 */
 
 function empty() {
@@ -172,7 +172,6 @@ const allowed_option = {
         "alert", "confirm", "console", "prompt"
     ],
     eval: true,
-    for: true,
     fudge: true,
     getset: true,
     long: true,
@@ -2037,11 +2036,7 @@ function statement() {
             warn("unexpected_a", the_label);
         }
         advance(":");
-        if (
-            next_token.id === "do"
-            || next_token.id === "for"
-            || next_token.id === "while"
-        ) {
+        if (next_token.id === "do" || next_token.id === "while") {
             enroll(the_label, "label", true);
             the_label.init = true;
             the_label.dead = false;
@@ -3427,50 +3422,7 @@ stmt("export", function () {
     return the_export;
 });
 stmt("for", function () {
-    let first;
-    const the_for = token;
-    if (!option.for) {
-        warn("unexpected_a", the_for);
-    }
-    not_top_level(the_for);
-    functionage.loop += 1;
-    advance("(");
-    token.free = true;
-    if (next_token.id === ";") {
-        return stop("expected_a_b", the_for, "while (", "for (;");
-    }
-    if (
-        next_token.id === "var"
-        || next_token.id === "let"
-        || next_token.id === "const"
-    ) {
-        return stop("unexpected_a");
-    }
-    first = expression(0);
-    if (first.id === "in") {
-        if (first.expression[0].arity !== "variable") {
-            warn("bad_assignment_a", first.expression[0]);
-        }
-        the_for.name = first.expression[0];
-        the_for.expression = first.expression[1];
-        warn("expected_a_b", the_for, "Object.keys", "for in");
-    } else {
-        the_for.initial = first;
-        advance(";");
-        the_for.expression = expression(0);
-        advance(";");
-        the_for.inc = expression(0);
-        if (the_for.inc.id === "++") {
-            warn("expected_a_b", the_for.inc, "+= 1", "++");
-        }
-    }
-    advance(")");
-    the_for.block = block();
-    if (the_for.block.disrupt === true) {
-        warn("weird_loop", the_for);
-    }
-    functionage.loop -= 1;
-    return the_for;
+    stop("unexpected_a", token);
 });
 stmt("function", do_function);
 stmt("if", function () {
@@ -4019,18 +3971,6 @@ preaction("statement", "{", function (thing) {
     blockage = thing;
     thing.live = [];
 });
-preaction("statement", "for", function (thing) {
-    if (thing.name !== undefined) {
-        const the_variable = lookup(thing.name);
-        if (the_variable !== undefined) {
-            the_variable.init = true;
-            if (!the_variable.writable) {
-                warn("bad_assignment_a", thing.name);
-            }
-        }
-    }
-    walk_statement(thing.initial);
-});
 preaction("statement", "function", preaction_function);
 preaction("unary", "~", bitwise_check);
 preaction("unary", "function", preaction_function);
@@ -4314,9 +4254,6 @@ postaction("binary", "[", function (thing) {
 postaction("statement", "{", pop_block);
 postaction("statement", "const", action_var);
 postaction("statement", "export", top_level_only);
-postaction("statement", "for", function (thing) {
-    walk_statement(thing.inc);
-});
 postaction("statement", "function", postaction_function);
 postaction("statement", "import", function (the_thing) {
     const name = the_thing.name;
