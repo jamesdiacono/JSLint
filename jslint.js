@@ -149,23 +149,25 @@ const allowed_option = {
 
     bitwise: true,
     browser: [
-        "caches", "CharacterData", "clearInterval", "clearTimeout", "document",
-        "DocumentType", "DOMException", "Element", "Event", "event", "fetch",
-        "FileReader", "FontFace", "FormData", "history", "IntersectionObserver",
-        "localStorage", "location", "MutationObserver", "name", "navigator",
-        "screen", "sessionStorage", "setInterval", "setTimeout", "Storage",
-        "TextDecoder", "TextEncoder", "URL", "window", "Worker",
-        "XMLHttpRequest"
+        "Blob", "caches", "cancelAnimationFrame", "CharacterData",
+        "clearInterval", "clearTimeout", "crypto", "document", "DocumentType",
+        "DOMException", "Element", "Event", "fetch", "FileReader", "FontFace",
+        "FormData", "history", "IntersectionObserver", "localStorage",
+        "location", "MutationObserver", "navigator", "requestAnimationFrame",
+        "ResizeObserver", "screen", "sessionStorage", "setInterval",
+        "setTimeout", "Storage", "TextDecoder", "TextEncoder", "URL",
+        "WebSocket", "window", "Worker", "XMLHttpRequest"
     ],
     couch: [
         "emit", "getRow", "isArray", "log", "provides", "registerType",
         "require", "send", "start", "sum", "toJSON"
     ],
     deno: [
-        "clearInterval", "clearTimeout", "Deno", "DOMException", "Event",
-        "fetch", "FileReader", "FormData", "localStorage", "navigator",
-        "sessionStorage", "setInterval", "setTimeout", "Storage", "TextDecoder",
-        "TextEncoder", "URL", "window", "Worker"
+        "Blob", "clearInterval", "clearTimeout", "crypto", "Deno",
+        "DOMException", "Event", "fetch", "FileReader", "FormData",
+        "localStorage", "navigator", "sessionStorage", "setInterval",
+        "setTimeout", "Storage", "TextDecoder", "TextEncoder", "URL",
+        "WebSocket", "window", "Worker"
     ],
     devel: [
         "alert", "confirm", "console", "prompt"
