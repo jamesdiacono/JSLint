@@ -89,7 +89,7 @@
     a, and, arity, assign, b, bad_assignment_a, bad_directive_a, bad_get,
     bad_module_name_a, bad_option_a, bad_property_a, bad_set, bitwise, block,
     body, browser, c, calls, catch, closer, closure, code, column, concat,
-    constant, context, convert, couch, create, d, dead, default, deno, devel,
+    constant, context, couch, create, d, dead, default, deno, devel,
     directive, directives, disrupt, dot, duplicate_a, edition, ellipsis, else,
     empty_block, eval, every, expected_a, expected_a_at_b_c, expected_a_b,
     expected_a_b_from_c_d, expected_a_before_b, expected_a_next_at_b,
@@ -105,7 +105,7 @@
     nested_comment, new, node, not_label_a, nr, nud, null, number_isNaN, ok,
     open, opening, option, out_of_scope_a, parameters, parent, pop, property,
     push, quote, raw, redefinition_a_b, replace, required_a_optional_b,
-    reserved_a, role, search, shebang, signature, single, slice, sort, split,
+    reserved_a, role, search, shebang, signature, slice, sort, split,
     startsWith, statement, stop, subscript_a, test, this, thru, todo_comment,
     tokens, too_long, too_many_digits, tree, try, type, u, unclosed_comment,
     unclosed_mega, unclosed_string, undeclared_a, unexpected_a,
@@ -161,7 +161,6 @@ const allowed_option = {
         "emit", "getRow", "isArray", "log", "provides", "registerType",
         "require", "send", "start", "sum", "toJSON"
     ],
-    convert: true,
     deno: [
         "clearInterval", "clearTimeout", "Deno", "DOMException", "Event",
         "fetch", "FileReader", "FormData", "localStorage", "navigator",
@@ -182,7 +181,6 @@ const allowed_option = {
         "TextEncoder", "URL", "URLSearchParams", "__dirname", "__filename"
     ],
     null: true,
-    single: true,
     this: true,
     white: true
 };
@@ -1357,9 +1355,7 @@ function tokenize(source) {
             return string(snippet);
         }
         if (snippet === "'") {
-            if (!option.single) {
-                warn_at("use_double", line, column);
-            }
+            warn_at("use_double", line, column);
             return string(snippet);
         }
 
@@ -4092,12 +4088,10 @@ postaction("binary", function (thing) {
         }
     }
     if (thing.id === "+") {
-        if (!option.convert) {
-            if (thing.expression[0].value === "") {
-                warn("expected_a_b", thing, "String(...)", "\"\" +");
-            } else if (thing.expression[1].value === "") {
-                warn("expected_a_b", thing, "String(...)", "+ \"\"");
-            }
+        if (thing.expression[0].value === "") {
+            warn("expected_a_b", thing, "String(...)", "\"\" +");
+        } else if (thing.expression[1].value === "") {
+            warn("expected_a_b", thing, "String(...)", "+ \"\"");
         }
     } else if (thing.id === "[") {
         if (thing.expression[0].id === "window") {
@@ -4328,9 +4322,7 @@ postaction("unary", function (thing) {
             warn("unexpected_a", thing);
         }
     } else if (thing.id === "!!") {
-        if (!option.convert) {
-            warn("expected_a_b", thing, "Boolean(...)", "!!");
-        }
+        warn("expected_a_b", thing, "Boolean(...)", "!!");
     } else if (
         thing.id !== "["
         && thing.id !== "{"
@@ -4344,19 +4336,7 @@ postaction("unary", function (thing) {
 });
 postaction("unary", "function", postaction_function);
 postaction("unary", "+", function (thing) {
-    if (!option.convert) {
-        warn("expected_a_b", thing, "Number(...)", "+");
-    }
-    const right = thing.expression;
-    if (right.id === "(" && right.expression[0].id === "new") {
-        warn("unexpected_a_before_b", thing, "+", "new");
-    } else if (
-        right.constant
-        || right.id === "{"
-        || (right.id === "[" && right.arity !== "binary")
-    ) {
-        warn("unexpected_a", thing, "+");
-    }
+    warn("expected_a_b", thing, "Number(...)", "+");
 });
 
 function delve(the_function) {
