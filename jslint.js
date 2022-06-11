@@ -1,5 +1,5 @@
 // jslint.js
-// 2022-01-28
+// 2022-06-11
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -153,10 +153,11 @@ const allowed_option = {
         "clearInterval", "clearTimeout", "crypto", "document", "DocumentType",
         "DOMException", "Element", "Event", "fetch", "FileReader", "FontFace",
         "FormData", "history", "IntersectionObserver", "localStorage",
-        "location", "MutationObserver", "navigator", "requestAnimationFrame",
-        "ResizeObserver", "screen", "sessionStorage", "setInterval",
-        "setTimeout", "Storage", "TextDecoder", "TextEncoder", "URL",
-        "WebSocket", "window", "Worker", "XMLHttpRequest"
+        "location", "MutationObserver", "navigator", "ReadableStream",
+        "Request", "requestAnimationFrame", "ResizeObserver", "Response",
+        "screen", "sessionStorage", "setInterval", "setTimeout", "Storage",
+        "TextDecoder", "TextEncoder", "TransformStream", "URL", "WebSocket",
+        "window", "Worker", "WritableStream", "XMLHttpRequest"
     ],
     couch: [
         "emit", "getRow", "isArray", "log", "provides", "registerType",
@@ -165,9 +166,10 @@ const allowed_option = {
     deno: [
         "Blob", "clearInterval", "clearTimeout", "crypto", "Deno",
         "DOMException", "Event", "fetch", "FileReader", "FormData",
-        "localStorage", "navigator", "sessionStorage", "setInterval",
-        "setTimeout", "Storage", "TextDecoder", "TextEncoder", "URL",
-        "WebSocket", "window", "Worker"
+        "localStorage", "navigator", "ReadableStream", "Request", "Response",
+        "sessionStorage", "setInterval", "setTimeout", "Storage", "TextDecoder",
+        "TextEncoder", "TransformStream", "URL", "WebSocket", "window",
+        "Worker", "WritableStream"
     ],
     devel: [
         "alert", "confirm", "console", "prompt"
@@ -178,7 +180,7 @@ const allowed_option = {
     long: true,
     node: [
         "Buffer", "clearImmediate", "clearInterval", "clearTimeout",
-        "console", "exports", "module", "process", "require",
+        "console", "exports", "fetch", "module", "process", "require",
         "setImmediate", "setInterval", "setTimeout", "TextDecoder",
         "TextEncoder", "URL", "URLSearchParams", "__dirname", "__filename"
     ],
@@ -4799,7 +4801,7 @@ export default Object.freeze(function jslint(
     }
     return {
         directives,
-        edition: "2022-01-28",
+        edition: "2022-06-11",
         exports,
         froms,
         functions,
