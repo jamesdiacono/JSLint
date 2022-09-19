@@ -1,5 +1,5 @@
 // jslint.js
-// 2022-06-11
+// 2022-09-19
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -87,11 +87,11 @@
 
 /*property
     a, and, arity, assign, b, bad_assignment_a, bad_directive_a, bad_get,
-    bad_module_name_a, bad_option_a, bad_property_a, bad_set, bitwise, block,
-    body, browser, c, calls, catch, closer, closure, code, column, concat,
-    constant, context, couch, create, d, dead, default, deno, devel,
-    directive, directives, disrupt, dot, duplicate_a, edition, ellipsis, else,
-    empty_block, eval, every, expected_a, expected_a_at_b_c, expected_a_b,
+    bad_import_meta_a, bad_module_name_a, bad_option_a, bad_property_a, bad_set,
+    bitwise, block, body, browser, c, calls, catch, closer, closure, code,
+    column, concat, constant, context, couch, create, d, dead, default, deno,
+    devel, directive, directives, disrupt, dot, duplicate_a, edition, ellipsis,
+    else, empty_block, eval, every, expected_a, expected_a_at_b_c, expected_a_b,
     expected_a_b_from_c_d, expected_a_before_b, expected_a_next_at_b,
     expected_digits_after_a, expected_four_digits, expected_identifier_a,
     expected_line_break_a_b, expected_regexp_factor_a, expected_space_a_b,
@@ -258,6 +258,7 @@ const bundle = {
     bad_assignment_a: "Bad assignment to '{a}'.",
     bad_directive_a: "Bad directive '{a}'.",
     bad_get: "A get function takes no parameters.",
+    bad_import_meta_a: "Bad import.meta property '{a}'.",
     bad_module_name_a: "Bad module name '{a}'.",
     bad_option_a: "Bad option '{a}'.",
     bad_property_a: "Bad property name '{a}'.",
@@ -2022,7 +2023,7 @@ function semicolon() {
 
 function statement() {
 
-// Parse a statement. Any statement may have a label, but only four statements
+// Parse a statement. Any statement may have a label, but only two statements
 // have use for one. A statement can be one of the standard statements, or
 // an assignment expression, or an invocation expression.
 
@@ -2055,11 +2056,11 @@ function statement() {
     first = token;
     first.statement = true;
     the_symbol = syntax[first.id];
-    if (the_symbol !== undefined && the_symbol.fud !== undefined) {
-        the_symbol.disrupt = false;
-        the_symbol.statement = true;
-        the_statement = the_symbol.fud();
-    } else {
+    if (
+        the_symbol === undefined
+        || the_symbol.fud === undefined
+        || (token.id === "import" && next_token.id === "(")
+    ) {
 
 // It is an expression statement.
 
@@ -2067,7 +2068,18 @@ function statement() {
         if (the_statement.wrapped && the_statement.id !== "(") {
             warn("unexpected_a", first);
         }
+        if (
+            the_statement.id === "("
+            && the_statement.expression[0].id === "import"
+        ) {
+
+// Modules should not be imported for their side effects.
+
+            warn("unexpected_a");
+        }
         semicolon();
+    } else {
+        the_statement = the_symbol.fud();
     }
     if (the_label !== undefined) {
         the_label.dead = true;
@@ -2440,6 +2452,16 @@ constant("Function", "function", function () {
         warn("unexpected_a", token);
     } else if (next_token.id !== "(") {
         warn("expected_a_before_b", next_token, "(", artifact());
+    }
+    return token;
+});
+constant("import", "function", function () {
+
+// The dynamic import function resembles a constant, but its use is far more
+// restricted.
+
+    if (next_token.id !== "(" && next_token.id !== ".") {
+        warn("unexpected_a", next_token);
     }
     return token;
 });
@@ -3451,25 +3473,6 @@ stmt("if", function () {
 });
 stmt("import", function () {
     const the_import = token;
-    if (next_token.id === "(") {
-        the_import.arity = "unary";
-        the_import.constant = true;
-        the_import.statement = false;
-        advance("(");
-        const string = expression(0);
-        if (string.id !== "(string)") {
-            warn("expected_string_a", string);
-        }
-        froms.push(token.value);
-        advance(")");
-        advance(".");
-        advance("then");
-        advance("(");
-        the_import.expression = expression(0);
-        advance(")");
-        semicolon();
-        return the_import;
-    }
     let name;
     if (typeof module_mode === "object") {
         warn("unexpected_directive_a", module_mode, module_mode.directive);
@@ -3976,10 +3979,12 @@ preaction("statement", "function", preaction_function);
 preaction("unary", "~", bitwise_check);
 preaction("unary", "function", preaction_function);
 preaction("variable", function (thing) {
-    const the_variable = lookup(thing);
-    if (the_variable !== undefined) {
-        thing.variable = the_variable;
-        the_variable.used += 1;
+    if (thing.id !== "import") {
+        const the_variable = lookup(thing);
+        if (the_variable !== undefined) {
+            thing.variable = the_variable;
+            the_variable.used += 1;
+        }
     }
 });
 
@@ -4105,9 +4110,27 @@ postaction("binary", function (thing) {
         if (thing.expression[0].id === "self") {
             warn("weird_expression_a", thing, "self[...]");
         }
+        if (
+            thing.expression[0].id === "."
+            && thing.expression[0].name.id === "meta"
+            && thing.expression[0].expression.id === "import"
+        ) {
+            warn("weird_expression_a", thing, "import.meta[...]");
+        }
     } else if (thing.id === "." || thing.id === "?.") {
         if (thing.expression.id === "RegExp") {
             warn("weird_expression_a", thing);
+        }
+        if (thing.expression.id === "import" && thing.name.id !== "meta") {
+            warn("unexpected_a", thing.name);
+        }
+        if (
+            (thing.expression.id === "." || thing.expression.id === "?.")
+            && thing.expression.name.id === "meta"
+            && thing.expression.expression.id === "import"
+            && (thing.name.id !== "resolve" && thing.name.id !== "url")
+        ) {
+            warn("bad_import_meta_a", thing.name);
         }
     } else if (thing.id !== "=>" && thing.id !== "(") {
         right = thing.expression[1];
@@ -4154,6 +4177,33 @@ postaction("binary", "(", function (thing) {
     if (left.id === "new") {
         the_new = left;
         left = left.expression;
+    }
+    if (
+        left.id === "import" || (
+            left.id === "."
+            && left.name.id === "resolve"
+            && left.expression.id === "."
+            && left.expression.name.id === "meta"
+            && left.expression.expression.id === "import"
+        )
+    ) {
+
+// This is a dynamic import expression, like import() or import.meta.resolve().
+// Both functions take a single parameter, which must be a string literal.
+
+        arg = thing.expression;
+        if (arg.length < 2) {
+            warn_at("expected_string_a", thing.line, thing.thru, "");
+        } else {
+            if (arg.length > 2) {
+                warn("unexpected_a", arg[2]);
+            } else if (arg[1].id !== "(string)") {
+                warn("expected_type_string_a", arg[1]);
+            } else if (!rx_module.test(arg[1].value)) {
+                warn("bad_module_name_a", arg[1]);
+            }
+            froms.push(arg[1].value);
+        }
     }
     if (left.id === "function") {
         if (!thing.wrapped) {
@@ -4769,9 +4819,7 @@ export default Object.freeze(function jslint(
 
 // If we are not in a browser, then the file form of strict pragma may be used.
 
-                if (
-                    next_token.value === "use strict"
-                ) {
+                if (next_token.value === "use strict") {
                     advance("(string)");
                     advance(";");
                 }
