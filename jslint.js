@@ -116,9 +116,9 @@
     unexpected_typeof_a, uninitialized_a, unreachable_a,
     unregistered_property_a, unused_a, use_double, use_open, use_spaces, used,
     value, var_loop, variable, warning, warnings, weird_condition_a,
-    weird_expression_a, weird_loop, weird_relation_a, white, wrap_condition,
-    wrap_immediate, wrap_parameter, wrap_regexp, wrap_unary, wrapped, writable,
-    y
+    weird_expression_a, weird_loop, weird_relation_a, white, worker,
+    wrap_condition, wrap_immediate, wrap_parameter, wrap_regexp, wrap_unary,
+    wrapped, writable, y
 */
 
 function empty() {
@@ -186,7 +186,8 @@ const allowed_option = {
     ],
     null: true,
     this: true,
-    white: true
+    white: true,
+    worker: ["self"]
 };
 
 const anticondition = populate([
