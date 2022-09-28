@@ -1,5 +1,5 @@
 // jslint.js
-// 2022-09-19
+// 2022-09-28
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -2792,7 +2792,7 @@ function parameter_list() {
                     signature.push(subparam.id);
                     if (next_token.id === "=") {
                         advance("=");
-                        subparam.expression = expression();
+                        subparam.expression = expression(150);
                         param.open = true;
                     }
                     param.names.push(subparam);
@@ -2832,7 +2832,7 @@ function parameter_list() {
                     param.names.push(subparam);
                     if (next_token.id === "=") {
                         advance("=");
-                        subparam.expression = expression();
+                        subparam.expression = expression(150);
                         param.open = true;
                     }
                     if (next_token.id === ",") {
@@ -2874,7 +2874,7 @@ function parameter_list() {
                     if (next_token.id === "=") {
                         optional = param;
                         advance("=");
-                        param.expression = expression(0);
+                        param.expression = expression(150);
                     } else {
                         if (optional !== undefined) {
                             warn(
@@ -3243,7 +3243,7 @@ function do_var() {
                 name.init = true;
                 if (next_token.id === "=") {
                     advance("=");
-                    name.expression = expression();
+                    name.expression = expression(150);
                     the_brace.open = true;
                 }
                 if (next_token.id === ",") {
@@ -3277,7 +3277,7 @@ function do_var() {
                 } else {
                     if (next_token.id === "=") {
                         advance("=");
-                        name.expression = expression();
+                        name.expression = expression(150);
                         the_bracket.open = true;
                     }
                     if (next_token.id === ",") {
@@ -4421,7 +4421,7 @@ function uninitialized_and_unused() {
 // or used. If the file imports or exports, then its global object is also
 // delved.
 
-    if (module_mode === true || option.node) {
+    if (module_mode === true || option.node || option.deno) {
         delve(global);
     }
     functions.forEach(delve);
@@ -4850,7 +4850,7 @@ export default Object.freeze(function jslint(
     }
     return {
         directives,
-        edition: "2022-06-11",
+        edition: "2022-09-28",
         exports,
         froms,
         functions,
