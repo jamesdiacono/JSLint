@@ -3804,11 +3804,13 @@ function lookup(thing) {
         }
         if (
             the_variable.dead
-            && (
-                the_variable.calls === undefined
-                || functionage.name === undefined
-                || the_variable.calls[functionage.name.id] === undefined
-            )
+            && stack.concat(functionage).every(function (outer) {
+                return (
+                    outer.name === undefined
+                    || the_variable.calls === undefined
+                    || the_variable.calls[outer.name.id] === undefined
+                );
+            })
         ) {
             warn("out_of_scope_a", thing);
         }
