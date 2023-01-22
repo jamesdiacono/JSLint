@@ -1,5 +1,5 @@
 // jslint.js
-// 2022-09-28
+// 2023-01-22
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -140,6 +140,32 @@ function populate(array, object = empty(), value = true) {
     return object;
 }
 
+const language = [
+
+// These are the globals that are provided by the language standard.
+
+    "Array", "ArrayBuffer", "Boolean", "DataView", "Date", "decodeURI",
+    "decodeURIComponent", "encodeURI", "encodeURIComponent", "Error",
+    "EvalError", "Float32Array", "Float64Array", "Generator",
+    "GeneratorFunction", "Int8Array", "Int16Array", "Int32Array", "Intl",
+    "JSON", "Map", "Math", "Number", "Object", "parseInt", "parseFloat",
+    "Promise", "Proxy", "RangeError", "ReferenceError", "Reflect", "RegExp",
+    "Set", "String", "Symbol", "SyntaxError", "System", "TypeError",
+    "Uint8Array", "Uint8ClampedArray", "Uint16Array", "Uint32Array",
+    "URIError", "WeakMap", "WeakSet"
+];
+
+const web = [
+
+// These are the globals that are provided by various web standards.
+
+    "AbortController", "Blob", "ByteLengthQueuingStrategy",
+    "CountQueuingStrategy", "DOMException", "Event", "fetch", "FormData",
+    "Headers", "ReadableStream", "Request", "Response", "TextDecoder",
+    "TextDecoderStream", "TextEncoder", "TextEncoderStream", "TransformStream",
+    "URL", "URLSearchParams", "WritableStream"
+];
+
 const allowed_option = {
 
 // These are the options that are recognized in the option object or that may
@@ -149,28 +175,23 @@ const allowed_option = {
 
     bitwise: true,
     browser: [
-        "Blob", "caches", "cancelAnimationFrame", "CharacterData",
-        "clearInterval", "clearTimeout", "crypto", "document", "DocumentType",
-        "DOMException", "Element", "Event", "fetch", "FileReader", "FontFace",
-        "FormData", "history", "IntersectionObserver", "localStorage",
-        "location", "MutationObserver", "navigator", "ReadableStream",
-        "Request", "requestAnimationFrame", "ResizeObserver", "Response",
-        "screen", "sessionStorage", "setInterval", "setTimeout", "Storage",
-        "TextDecoder", "TextEncoder", "TransformStream", "URL", "WebSocket",
-        "window", "Worker", "WritableStream", "XMLHttpRequest"
-    ],
+        "caches", "cancelAnimationFrame", "CharacterData", "clearInterval",
+        "clearTimeout", "crypto", "document", "DocumentType", "Element",
+        "FileReader", "FontFace", "history", "IntersectionObserver",
+        "localStorage", "location", "MutationObserver", "navigator",
+        "requestAnimationFrame", "ResizeObserver", "screen", "sessionStorage",
+        "setInterval", "setTimeout", "WebSocket", "window", "Worker",
+        "XMLHttpRequest"
+    ].concat(web),
     couch: [
         "emit", "getRow", "isArray", "log", "provides", "registerType",
         "require", "send", "start", "sum", "toJSON"
     ],
     deno: [
-        "Blob", "clearInterval", "clearTimeout", "crypto", "Deno",
-        "DOMException", "Event", "fetch", "FileReader", "FormData",
-        "localStorage", "navigator", "ReadableStream", "Request", "Response",
-        "sessionStorage", "setInterval", "setTimeout", "Storage", "TextDecoder",
-        "TextEncoder", "TransformStream", "URL", "WebSocket", "window",
-        "Worker", "WritableStream"
-    ],
+        "clearInterval", "clearTimeout", "crypto", "Deno", "FileReader",
+        "localStorage", "navigator", "sessionStorage", "setInterval",
+        "setTimeout", "WebSocket", "window", "Worker"
+    ].concat(web),
     devel: [
         "alert", "confirm", "console", "prompt"
     ],
@@ -179,11 +200,10 @@ const allowed_option = {
     getset: true,
     long: true,
     node: [
-        "Buffer", "clearImmediate", "clearInterval", "clearTimeout",
-        "console", "exports", "fetch", "module", "process", "require",
-        "setImmediate", "setInterval", "setTimeout", "TextDecoder",
-        "TextEncoder", "URL", "URLSearchParams", "__dirname", "__filename"
-    ],
+        "Buffer", "clearImmediate", "clearInterval", "clearTimeout", "console",
+        "exports", "module", "process", "require", "setImmediate",
+        "setInterval", "setTimeout", "__dirname", "__filename"
+    ].concat(web),
     null: true,
     this: true,
     white: true,
@@ -229,21 +249,6 @@ const spaceop = populate([
     "/=", "<", "<=", "<<", "<<=", "=", "==", "===", "=>", ">", ">=",
     ">>", ">>=", ">>>", ">>>=", "^", "^=", "|", "|=", "||"
 ]);
-
-const standard = [
-
-// These are the globals that are provided by the language standard.
-
-    "Array", "ArrayBuffer", "Boolean", "DataView", "Date", "decodeURI",
-    "decodeURIComponent", "encodeURI", "encodeURIComponent", "Error",
-    "EvalError", "Float32Array", "Float64Array", "Generator",
-    "GeneratorFunction", "Int8Array", "Int16Array", "Int32Array", "Intl",
-    "JSON", "Map", "Math", "Number", "Object", "parseInt", "parseFloat",
-    "Promise", "Proxy", "RangeError", "ReferenceError", "Reflect", "RegExp",
-    "Set", "String", "Symbol", "SyntaxError", "System", "TypeError",
-    "Uint8Array", "Uint8ClampedArray", "Uint16Array", "Uint32Array",
-    "URIError", "WeakMap", "WeakSet"
-];
 
 const bundle = {
 
@@ -4791,7 +4796,7 @@ export default Object.freeze(function jslint(
         token = global;
         token_nr = 0;
         var_mode = undefined;
-        populate(standard, declared_globals, false);
+        populate(language, declared_globals, false);
         populate(global_array, declared_globals, false);
         Object.keys(option).forEach(function (name) {
             if (option[name] === true) {
@@ -4850,7 +4855,7 @@ export default Object.freeze(function jslint(
     }
     return {
         directives,
-        edition: "2022-09-28",
+        edition: "2023-01-22",
         exports,
         froms,
         functions,
