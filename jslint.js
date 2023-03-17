@@ -1,5 +1,5 @@
 // jslint.js
-// 2023-01-30
+// 2023-03-17
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -1647,7 +1647,7 @@ function lookahead() {
 // Look ahead one token without advancing.
 
     const old_token_nr = token_nr;
-    const cadet = dispense(true);
+    const cadet = dispense();
     token_nr = old_token_nr;
     return cadet;
 }
@@ -2397,7 +2397,7 @@ function ternary(id1, id2) {
         token.arity = "ternary";
         the_token.arity = "ternary";
         the_token.expression = [left, second, expression(10)];
-        if (next_token.id !== ")") {
+        if (next_token.id !== ")" && next_token.id !== "]") {
             warn("use_open", the_token);
         }
         return the_token;
@@ -4858,7 +4858,7 @@ export default Object.freeze(function jslint(
     }
     return {
         directives,
-        edition: "2023-01-30",
+        edition: "2023-03-17",
         exports,
         froms,
         functions,
