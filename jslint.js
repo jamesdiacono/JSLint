@@ -1,5 +1,5 @@
 // jslint.js
-// 2023-05-31
+// 2023-07-06
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -1977,7 +1977,7 @@ function are_similar(a, b) {
         return false;
     }
     if (a.arity === b.arity && a.id === b.id) {
-        if (a.id === ".") {
+        if (a.id === "." || a.id === "?.") {
             return (
                 are_similar(a.expression, b.expression)
                 && are_similar(a.name, b.name)
@@ -4857,7 +4857,7 @@ export default Object.freeze(function jslint(
     }
     return {
         directives,
-        edition: "2023-05-31",
+        edition: "2023-07-06", // Happy Birthday, Gabby!
         exports,
         froms,
         functions,
