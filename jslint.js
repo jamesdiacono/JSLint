@@ -1,5 +1,5 @@
 // jslint.js
-// 2023-07-06
+// 2023-08-17
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -2770,6 +2770,14 @@ prefix("void", function () {
     return the_void;
 });
 
+function default_expression() {
+    const the_default = expression(150);
+    if (the_default.id === "undefined") {
+        warn("unexpected_a", the_default, the_default.id);
+    }
+    return the_default;
+}
+
 function parameter_list() {
     const list = [];
     let optional;
@@ -2801,7 +2809,7 @@ function parameter_list() {
                     signature.push(subparam.id);
                     if (next_token.id === "=") {
                         advance("=");
-                        subparam.expression = expression(150);
+                        subparam.expression = default_expression();
                         param.open = true;
                     }
                     param.names.push(subparam);
@@ -2841,7 +2849,7 @@ function parameter_list() {
                     param.names.push(subparam);
                     if (next_token.id === "=") {
                         advance("=");
-                        subparam.expression = expression(150);
+                        subparam.expression = default_expression();
                         param.open = true;
                     }
                     if (next_token.id === ",") {
@@ -2883,7 +2891,7 @@ function parameter_list() {
                     if (next_token.id === "=") {
                         optional = param;
                         advance("=");
-                        param.expression = expression(150);
+                        param.expression = default_expression();
                     } else {
                         if (optional !== undefined) {
                             warn(
@@ -3252,7 +3260,7 @@ function do_var() {
                 name.init = true;
                 if (next_token.id === "=") {
                     advance("=");
-                    name.expression = expression(150);
+                    name.expression = default_expression();
                     the_brace.open = true;
                 }
                 if (next_token.id === ",") {
@@ -3286,7 +3294,7 @@ function do_var() {
                 } else {
                     if (next_token.id === "=") {
                         advance("=");
-                        name.expression = expression(150);
+                        name.expression = default_expression();
                         the_bracket.open = true;
                     }
                     if (next_token.id === ",") {
@@ -4861,7 +4869,7 @@ export default Object.freeze(function jslint(
     }
     return {
         directives,
-        edition: "2023-07-06", // Happy Birthday, Gabby!
+        edition: "2023-08-17",
         exports,
         froms,
         functions,
