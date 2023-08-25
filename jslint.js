@@ -1,5 +1,5 @@
 // jslint.js
-// 2023-08-17
+// 2023-08-25
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -1014,12 +1014,7 @@ function tokenize(source) {
                 if (char === "-") {
                     next_char("-");
                     if (!subklass()) {
-                        return stop_at(
-                            "unexpected_a",
-                            line,
-                            column - 1,
-                            "-"
-                        );
+                        return stop_at("unexpected_a", line, column - 1, "-");
                     }
                 }
                 return ranges();
@@ -1040,7 +1035,7 @@ function tokenize(source) {
                     warn_at(
                         "expected_a_before_b",
                         line,
-                        column,
+                        column - 1,
                         "\\",
                         char
                     );
@@ -4869,7 +4864,7 @@ export default Object.freeze(function jslint(
     }
     return {
         directives,
-        edition: "2023-08-17",
+        edition: "2023-08-25", // Happy Birthday, Aaron!
         exports,
         froms,
         functions,
