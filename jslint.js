@@ -105,7 +105,7 @@
     nested_comment, new, node, not_label_a, nr, nud, null, number_isNaN, ok,
     open, opening, option, out_of_scope_a, parameters, parent, pop, property,
     push, quote, raw, redefinition_a_b, replace, required_a_optional_b,
-    reserved_a, role, search, shebang, signature, slice, sort, split,
+    reserved_a, role, search, shebang, signature, slice, snug, sort, split,
     startsWith, statement, stop, subscript_a, test, this, thru, todo_comment,
     tokens, too_long, too_many_digits, tree, try, type, u, unclosed_comment,
     unclosed_mega, unclosed_string, undeclared_a, unexpected_a,
@@ -2395,9 +2395,6 @@ function ternary(id1, id2) {
         token.arity = "ternary";
         the_token.arity = "ternary";
         the_token.expression = [left, second, expression(10)];
-        if (next_token.id !== ")" && next_token.id !== "]") {
-            warn("use_open", the_token);
-        }
         return the_token;
     };
     return the_symbol;
@@ -2580,7 +2577,7 @@ infix("(", 160, function (left) {
         if (the_argument.wrapped === true) {
             warn("unexpected_a", the_paren);
         }
-        if (the_argument.id === "(") {
+        if (the_argument.id === "(" || the_argument.id === "?") {
             the_argument.wrapped = true;
         }
     } else {
@@ -3973,6 +3970,9 @@ preaction("binary", "(", function (thing) {
         }
     }
 });
+preaction("binary", "[", function (thing) {
+    thing.expression[1].snug = true;
+});
 preaction("binary", "in", function (thing) {
     warn("infix_in", thing);
 });
@@ -3990,6 +3990,16 @@ preaction("statement", "{", function (thing) {
     thing.live = [];
 });
 preaction("statement", "function", preaction_function);
+preaction("unary", "[", function (thing) {
+    if (thing.expression.length === 1) {
+        thing.expression[0].snug = true;
+    }
+});
+preaction("unary", "`", function (thing) {
+    thing.expression.forEach(function (expression) {
+        expression.snug = true;
+    });
+});
 preaction("unary", "~", bitwise_check);
 preaction("unary", "function", preaction_function);
 preaction("variable", function (thing) {
@@ -4349,7 +4359,9 @@ postaction("statement", "try", function (thing) {
 });
 postaction("statement", "var", action_var);
 postaction("ternary", function (thing) {
-    if (
+    if (thing.wrapped !== true && thing.snug !== true) {
+        warn("use_open", thing);
+    } else if (
         is_weird(thing.expression[0])
         || thing.expression[0].constant === true
         || are_similar(thing.expression[1], thing.expression[2])
@@ -4661,10 +4673,12 @@ function whitage() {
 // If right is a ternary operator, line it up on the margin.
 
                     } else if (right.arity === "ternary") {
-                        if (open) {
-                            at_margin(0);
-                        } else {
-                            warn("use_open", right);
+                        if (right.id === "?") {
+                            if (open) {
+                                at_margin(0);
+                            } else {
+                                warn("use_open", right);
+                            }
                         }
                     } else if (
                         right.arity === "binary"
