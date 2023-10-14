@@ -1,5 +1,5 @@
 // jslint.js
-// 2023-08-25
+// 2023-10-06
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -159,11 +159,12 @@ const web = [
 
 // These are the globals that are provided by various web standards.
 
-    "AbortController", "Blob", "ByteLengthQueuingStrategy",
-    "CountQueuingStrategy", "DOMException", "Event", "fetch", "FormData",
-    "Headers", "performance", "ReadableStream", "Request", "Response",
-    "TextDecoder", "TextDecoderStream", "TextEncoder", "TextEncoderStream",
-    "TransformStream", "URL", "URLSearchParams", "WebAssembly", "WritableStream"
+    "AbortController", "atob", "Blob", "ByteLengthQueuingStrategy", "btoa",
+    "CountQueuingStrategy", "crypto", "DOMException", "Event", "fetch",
+    "FormData", "Headers", "performance", "ReadableStream", "Request",
+    "Response", "TextDecoder", "TextDecoderStream", "TextEncoder",
+    "TextEncoderStream", "TransformStream", "URL", "URLSearchParams",
+    "WebAssembly", "WritableStream"
 ];
 
 const allowed_option = {
@@ -176,21 +177,20 @@ const allowed_option = {
     bitwise: true,
     browser: [
         "caches", "cancelAnimationFrame", "CharacterData", "clearInterval",
-        "clearTimeout", "crypto", "document", "DocumentType", "Element",
-        "FileReader", "FontFace", "history", "IntersectionObserver",
-        "localStorage", "location", "MutationObserver", "navigator",
-        "requestAnimationFrame", "ResizeObserver", "screen", "sessionStorage",
-        "setInterval", "setTimeout", "WebSocket", "window", "Worker",
-        "XMLHttpRequest"
+        "clearTimeout", "document", "DocumentType", "Element", "FileReader",
+        "FontFace", "history", "IntersectionObserver", "localStorage",
+        "location", "MutationObserver", "navigator", "requestAnimationFrame",
+        "ResizeObserver", "screen", "sessionStorage", "setInterval",
+        "setTimeout", "WebSocket", "window", "Worker", "XMLHttpRequest"
     ].concat(web),
     couch: [
         "emit", "getRow", "isArray", "log", "provides", "registerType",
         "require", "send", "start", "sum", "toJSON"
     ],
     deno: [
-        "clearInterval", "clearTimeout", "crypto", "Deno", "FileReader",
-        "localStorage", "navigator", "sessionStorage", "setInterval",
-        "setTimeout", "WebSocket", "window", "Worker"
+        "clearInterval", "clearTimeout", "Deno", "FileReader", "localStorage",
+        "navigator", "sessionStorage", "setInterval", "setTimeout", "WebSocket",
+        "window", "Worker"
     ].concat(web),
     devel: [
         "alert", "confirm", "console", "prompt"
@@ -4864,7 +4864,7 @@ export default Object.freeze(function jslint(
     }
     return {
         directives,
-        edition: "2023-08-25", // Happy Birthday, Aaron!
+        edition: "2023-10-06",
         exports,
         froms,
         functions,
