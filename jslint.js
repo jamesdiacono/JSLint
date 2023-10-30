@@ -1,5 +1,5 @@
 // jslint.js
-// 2023-10-06
+// 2023-10-30
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -4107,41 +4107,7 @@ function postaction_function(thing) {
 }
 
 postaction("binary", function (thing) {
-    let right;
-    if (relationop[thing.id]) {
-        if (
-            is_weird(thing.expression[0])
-            || is_weird(thing.expression[1])
-            || are_similar(thing.expression[0], thing.expression[1])
-            || (
-                thing.expression[0].constant === true
-                && thing.expression[1].constant === true
-            )
-        ) {
-            warn("weird_relation_a", thing);
-        }
-    }
-    if (thing.id === "+") {
-        if (thing.expression[0].value === "") {
-            warn("expected_a_b", thing, "String(...)", "\"\" +");
-        } else if (thing.expression[1].value === "") {
-            warn("expected_a_b", thing, "String(...)", "+ \"\"");
-        }
-    } else if (thing.id === "[") {
-        if (thing.expression[0].id === "window") {
-            warn("weird_expression_a", thing, "window[...]");
-        }
-        if (thing.expression[0].id === "self") {
-            warn("weird_expression_a", thing, "self[...]");
-        }
-        if (
-            thing.expression[0].id === "."
-            && thing.expression[0].name.id === "meta"
-            && thing.expression[0].expression.id === "import"
-        ) {
-            warn("weird_expression_a", thing, "import.meta[...]");
-        }
-    } else if (thing.id === "." || thing.id === "?.") {
+    if (thing.id === "." || thing.id === "?.") {
         if (thing.expression.id === "RegExp") {
             warn("weird_expression_a", thing);
         }
@@ -4156,21 +4122,53 @@ postaction("binary", function (thing) {
         ) {
             warn("bad_import_meta_a", thing.name);
         }
-    } else if (thing.id !== "=>" && thing.id !== "(") {
-        right = thing.expression[1];
-        if (
-            (thing.id === "+" || thing.id === "-")
-            && right.id === thing.id
-            && right.arity === "unary"
-            && !right.wrapped
-        ) {
-            warn("wrap_unary", right);
+    }
+    if (Array.isArray(thing.expression)) {
+        const [left, right] = thing.expression;
+        if (relationop[thing.id]) {
+            if (
+                is_weird(left)
+                || is_weird(right)
+                || are_similar(left, right)
+                || (left.constant === true && right.constant === true)
+                || (left.constant === true && right.id === "!")
+                || (left.id === "!" && right.constant === true)
+            ) {
+                warn("weird_relation_a", thing);
+            }
         }
-        if (
-            thing.expression[0].constant === true
-            && right.constant === true
-        ) {
-            thing.constant = true;
+        if (thing.id === "+") {
+            if (left.value === "") {
+                warn("expected_a_b", thing, "String(...)", "\"\" +");
+            } else if (right.value === "") {
+                warn("expected_a_b", thing, "String(...)", "+ \"\"");
+            }
+        } else if (thing.id === "[") {
+            if (left.id === "window") {
+                warn("weird_expression_a", thing, "window[...]");
+            }
+            if (left.id === "self") {
+                warn("weird_expression_a", thing, "self[...]");
+            }
+            if (
+                left.id === "."
+                && left.name.id === "meta"
+                && left.expression.id === "import"
+            ) {
+                warn("weird_expression_a", thing, "import.meta[...]");
+            }
+        } else if (thing.id !== "=>" && thing.id !== "(") {
+            if (
+                (thing.id === "+" || thing.id === "-")
+                && right.id === thing.id
+                && right.arity === "unary"
+                && !right.wrapped
+            ) {
+                warn("wrap_unary", right);
+            }
+            if (left.constant === true && right.constant === true) {
+                thing.constant = true;
+            }
         }
     }
 });
@@ -4375,7 +4373,7 @@ postaction("ternary", function (thing) {
         thing.expression[1].id === "true"
         && thing.expression[2].id === "false"
     ) {
-        warn("expected_a_b", thing, "!!", "?");
+        warn("expected_a_b", thing, "Boolean(...)", "?");
     } else if (
         thing.expression[1].id === "false"
         && thing.expression[2].id === "true"
@@ -4878,7 +4876,7 @@ export default Object.freeze(function jslint(
     }
     return {
         directives,
-        edition: "2023-10-06",
+        edition: "2023-10-30",
         exports,
         froms,
         functions,
