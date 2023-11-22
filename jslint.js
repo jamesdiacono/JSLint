@@ -1,5 +1,5 @@
 // jslint.js
-// 2023-10-30
+// 2023-11-22
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -2043,6 +2043,7 @@ function statement() {
             the_label.init = true;
             the_label.dead = false;
             the_statement = statement();
+            the_label.dead = true;
             the_statement.label = the_label;
             the_statement.statement = true;
             return the_statement;
@@ -2080,9 +2081,6 @@ function statement() {
         semicolon();
     } else {
         the_statement = the_symbol.fud();
-    }
-    if (the_label !== undefined) {
-        the_label.dead = true;
     }
     return the_statement;
 }
@@ -3244,7 +3242,6 @@ function do_var() {
                 advance();
                 the_statement.names.push(name);
                 enroll(name, "variable", is_const);
-                name.dead = false;
                 name.init = true;
                 if (next_token.id === "=") {
                     advance("=");
@@ -3275,7 +3272,6 @@ function do_var() {
                 advance();
                 the_statement.names.push(name);
                 enroll(name, "variable", is_const);
-                name.dead = false;
                 name.init = true;
                 if (ellipsis) {
                     name.ellipsis = true;
@@ -3303,7 +3299,6 @@ function do_var() {
             enroll(name, "variable", is_const);
             if (next_token.id === "=" || is_const) {
                 advance("=");
-                name.dead = false;
                 name.init = true;
                 name.expression = expression(0);
             }
@@ -4872,7 +4867,7 @@ export default Object.freeze(function jslint(
     }
     return {
         directives,
-        edition: "2023-10-30",
+        edition: "2023-11-22",
         exports,
         froms,
         functions,
