@@ -1,5 +1,5 @@
 // jslint.js
-// 2023-11-22
+// 2024-04-08
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -88,7 +88,7 @@
 /*property
     a, and, arity, assign, b, bad_assignment_a, bad_directive_a, bad_get,
     bad_import_meta_a, bad_module_name_a, bad_option_a, bad_property_a, bad_set,
-    bitwise, block, body, browser, c, calls, catch, closer, closure, code,
+    bitwise, block, body, browser, bun, c, calls, catch, closer, closure, code,
     column, concat, constant, context, couch, create, d, dead, default, deno,
     devel, directive, directives, disrupt, dot, duplicate_a, edition, ellipsis,
     else, empty_block, eval, every, expected_a, expected_a_at_b_c, expected_a_b,
@@ -106,19 +106,19 @@
     open, opening, option, out_of_scope_a, parameters, parent, pop, property,
     push, quote, raw, redefinition_a_b, replace, required_a_optional_b,
     reserved_a, role, search, shebang, signature, slice, snug, sort, split,
-    startsWith, statement, stop, subscript_a, test, this, thru, todo_comment,
-    tokens, too_long, too_many_digits, tree, try, type, u, unclosed_comment,
-    unclosed_mega, unclosed_string, undeclared_a, unexpected_a,
-    unexpected_a_after_b, unexpected_a_before_b, unexpected_at_top_level_a,
-    unexpected_char_a, unexpected_comment, unexpected_directive_a,
-    unexpected_expression_a, unexpected_label_a, unexpected_parens,
-    unexpected_space_a_b, unexpected_statement_a, unexpected_trailing_space,
-    unexpected_typeof_a, uninitialized_a, unreachable_a,
-    unregistered_property_a, unused_a, use_double, use_open, use_spaces, used,
-    value, var_loop, variable, warning, warnings, weird_condition_a,
-    weird_expression_a, weird_loop, weird_relation_a, white, worker,
-    wrap_condition, wrap_immediate, wrap_parameter, wrap_regexp, wrap_unary,
-    wrapped, writable, y
+    startsWith, statement, stop, subscript_a, test, this, thru, tjs,
+    todo_comment, tokens, too_long, too_many_digits, tree, try, type, u,
+    unclosed_comment, unclosed_mega, unclosed_string, undeclared_a,
+    unexpected_a, unexpected_a_after_b, unexpected_a_before_b,
+    unexpected_at_top_level_a, unexpected_char_a, unexpected_comment,
+    unexpected_directive_a, unexpected_expression_a, unexpected_label_a,
+    unexpected_parens, unexpected_space_a_b, unexpected_statement_a,
+    unexpected_trailing_space, unexpected_typeof_a, uninitialized_a,
+    unreachable_a, unregistered_property_a, unused_a, use_double, use_open,
+    use_spaces, used, value, var_loop, variable, warning, warnings,
+    weird_condition_a, weird_expression_a, weird_loop, weird_relation_a, white,
+    worker, wrap_condition, wrap_immediate, wrap_parameter, wrap_regexp,
+    wrap_unary, wrapped, writable, y
 */
 
 function empty() {
@@ -160,11 +160,12 @@ const web = [
 // These are the globals that are provided by various web standards.
 
     "AbortController", "atob", "Blob", "ByteLengthQueuingStrategy", "btoa",
-    "CountQueuingStrategy", "crypto", "DOMException", "Event", "fetch",
-    "FormData", "Headers", "performance", "ReadableStream", "Request",
-    "Response", "TextDecoder", "TextDecoderStream", "TextEncoder",
-    "TextEncoderStream", "TransformStream", "URL", "URLSearchParams",
-    "WebAssembly", "WritableStream"
+    "clearInterval", "clearTimeout", "CompressionStream",
+    "CountQueuingStrategy", "crypto", "DecompressionStream", "DOMException",
+    "Event", "fetch", "FormData", "Headers", "performance", "ReadableStream",
+    "Request", "Response", "setInterval", "setTimeout", "TextDecoder",
+    "TextDecoderStream", "TextEncoder", "TextEncoderStream", "TransformStream",
+    "URL", "URLSearchParams", "WebAssembly", "WritableStream"
 ];
 
 const allowed_option = {
@@ -176,21 +177,23 @@ const allowed_option = {
 
     bitwise: true,
     browser: [
-        "caches", "cancelAnimationFrame", "CharacterData", "clearInterval",
-        "clearTimeout", "document", "DocumentType", "Element", "FileReader",
-        "FontFace", "history", "IntersectionObserver", "localStorage",
-        "location", "MutationObserver", "navigator", "requestAnimationFrame",
-        "ResizeObserver", "screen", "sessionStorage", "setInterval",
-        "setTimeout", "WebSocket", "window", "Worker", "XMLHttpRequest"
+        "caches", "cancelAnimationFrame", "CharacterData", "document",
+        "DocumentType", "Element", "FileReader", "FontFace", "history",
+        "IntersectionObserver", "localStorage", "location", "MutationObserver",
+        "navigator", "Node", "requestAnimationFrame", "ResizeObserver",
+        "screen", "sessionStorage", "WebSocket", "window", "Worker",
+        "XMLHttpRequest"
     ].concat(web),
+    bun: [
+        "Bun", "navigator", "WebSocket", "Worker"
+    ],
     couch: [
         "emit", "getRow", "isArray", "log", "provides", "registerType",
         "require", "send", "start", "sum", "toJSON"
     ],
     deno: [
-        "clearInterval", "clearTimeout", "Deno", "FileReader", "localStorage",
-        "navigator", "sessionStorage", "setInterval", "setTimeout", "WebSocket",
-        "window", "Worker"
+        "Deno", "FileReader", "localStorage", "navigator", "sessionStorage",
+        "WebSocket", "window", "Worker"
     ].concat(web),
     devel: [
         "alert", "confirm", "console", "prompt"
@@ -200,12 +203,14 @@ const allowed_option = {
     getset: true,
     long: true,
     node: [
-        "Buffer", "clearImmediate", "clearInterval", "clearTimeout", "console",
-        "exports", "module", "process", "require", "setImmediate",
-        "setInterval", "setTimeout", "__dirname", "__filename"
+        "Buffer", "clearImmediate", "console", "exports", "module", "process",
+        "require", "setImmediate", "__dirname", "__filename"
     ].concat(web),
     null: true,
     this: true,
+    tjs: [
+        "tjs", "navigator", "WebSocket", "Worker"
+    ].concat(web),
     white: true,
     worker: ["self"]
 };
@@ -4436,7 +4441,13 @@ function uninitialized_and_unused() {
 // or used. If the file imports or exports, then its global object is also
 // delved.
 
-    if (module_mode === true || option.node || option.deno) {
+    if (
+        module_mode === true
+        || option.node
+        || option.deno
+        || option.bun
+        || option.tjs
+    ) {
         delve(global);
     }
     functions.forEach(delve);
@@ -4867,7 +4878,7 @@ export default Object.freeze(function jslint(
     }
     return {
         directives,
-        edition: "2023-11-22",
+        edition: "2024-04-08",
         exports,
         froms,
         functions,
