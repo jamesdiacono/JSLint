@@ -2194,10 +2194,11 @@ function mutation_check(the_thing) {
     return true;
 }
 
-function left_check(left, right) {
+function left_check(left, right, chained = false) {
 
 // Warn if the left is not one of these:
 //      e.b
+//      e?.b
 //      e[b]
 //      e()
 //      ?:
@@ -2215,7 +2216,12 @@ function left_check(left, right) {
         )
         && (
             left.arity !== "binary"
-            || (id !== "." && id !== "(" && id !== "[")
+            || (
+                id !== "."
+                && (id !== "?." || chained)
+                && id !== "("
+                && id !== "["
+            )
         )
     ) {
         warn("unexpected_a", right);
@@ -2624,36 +2630,12 @@ infix(".", 170, function (left) {
 infix("?.", 170, function (left) {
     const the_token = token;
     const name = next_token;
-    if (
-        (
-            left.id !== "(string)"
-            || (name.id !== "indexOf" && name.id !== "repeat")
-        )
-        && (
-            left.id !== "["
-            || (
-                name.id !== "concat"
-                && name.id !== "forEach"
-                && name.id !== "join"
-                && name.id !== "map"
-            )
-        )
-        && (left.id !== "+" || name.id !== "slice")
-        && (
-            left.id !== "(regexp)"
-            || (name.id !== "exec" && name.id !== "test")
-        )
-    ) {
-        left_check(left, the_token);
-    }
+    left_check(left, the_token, true);
     if (!name.identifier) {
         stop("expected_identifier_a");
     }
     advance();
     survey(name);
-
-// The property name is not an expression.
-
     the_token.name = name;
     the_token.expression = left;
     return the_token;
