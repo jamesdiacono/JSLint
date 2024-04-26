@@ -1,5 +1,5 @@
 // jslint.js
-// 2024-04-08
+// 2024-04-26
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -4096,7 +4096,11 @@ postaction("binary", function (thing) {
             (thing.expression.id === "." || thing.expression.id === "?.")
             && thing.expression.name.id === "meta"
             && thing.expression.expression.id === "import"
-            && (thing.name.id !== "resolve" && thing.name.id !== "url")
+            && (
+                thing.name.id !== "resolve"
+                && thing.name.id !== "url"
+                && thing.name.id !== "main"
+            )
         ) {
             warn("bad_import_meta_a", thing.name);
         }
@@ -4860,7 +4864,7 @@ export default Object.freeze(function jslint(
     }
     return {
         directives,
-        edition: "2024-04-08",
+        edition: "2024-04-26",
         exports,
         froms,
         functions,
