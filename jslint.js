@@ -1,5 +1,5 @@
 // jslint.js
-// 2024-04-26
+// 2024-05-04
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -1963,12 +1963,12 @@ function are_similar(a, b) {
     if (a.id === "(string)") {
         a_string = a.value;
     } else if (a.id === "`" && a.constant) {
-        a_string = a.value[0];
+        a_string = a.value[0].value;
     }
     if (b.id === "(string)") {
         b_string = b.value;
     } else if (b.id === "`" && b.constant) {
-        b_string = b.value[0];
+        b_string = b.value[0].value;
     }
     if (typeof a_string === "string") {
         return a_string === b_string;
@@ -4864,7 +4864,7 @@ export default Object.freeze(function jslint(
     }
     return {
         directives,
-        edition: "2024-04-26",
+        edition: "2024-05-04",
         exports,
         froms,
         functions,
