@@ -38,7 +38,7 @@ const warnings = document.getElementById("JSLINT_WARNINGS");
 const warnings_list = document.getElementById("JSLINT_WARNINGS_LIST");
 
 function show_numbers() {
-    number.value = source.value.split(rx_crlf).map(function (ignore, index) {
+    number.value = source.value.split(rx_crlf).map(function (_, index) {
         return index + fudge_unit;
     }).join("\n");
 }
@@ -125,7 +125,7 @@ function call_jslint() {
 
 fudge.onchange = fudge_change;
 
-source.onchange = function (ignore) {
+source.onchange = function () {
     show_numbers();
 };
 

@@ -140,7 +140,7 @@ export default Object.freeze({
                         if (name.id === "{" || name.id === "[") {
                             name.names.forEach(extract);
                         } else {
-                            if (name.id !== "ignore") {
+                            if (name.id !== "_") {
                                 params.push(name.id);
                             }
                         }

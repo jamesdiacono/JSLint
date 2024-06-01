@@ -1,5 +1,5 @@
 // jslint.js
-// 2024-05-04
+// 2024-06-01
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -1802,7 +1802,7 @@ function enroll(name, role, readonly) {
 
 // Reserved words may not be enrolled.
 
-    if (syntax[id] !== undefined && id !== "ignore") {
+    if (syntax[id] !== undefined && id !== "_") {
         warn("reserved_a", name);
     } else {
 
@@ -1827,7 +1827,7 @@ function enroll(name, role, readonly) {
                 }
             });
             if (earlier) {
-                if (id === "ignore") {
+                if (id === "_") {
                     if (earlier.role === "variable") {
                         warn("unexpected_a", name);
                     }
@@ -2039,7 +2039,7 @@ function statement() {
     advance();
     if (token.identifier && next_token.id === ":") {
         the_label = token;
-        if (the_label.id === "ignore") {
+        if (the_label.id === "_") {
             warn("unexpected_a", the_label);
         }
         advance(":");
@@ -2135,7 +2135,7 @@ function block(special) {
 
 // Parse a block, a sequence of statements wrapped in braces.
 //  special "body"      The block is a function body.
-//          "ignore"    No warning on an empty block.
+//          "_"         No warning on an empty block.
 //          "naked"     No advance.
 //          undefined   An ordinary block.
 
@@ -2162,7 +2162,7 @@ function block(special) {
     stmts = statements();
     the_block.block = stmts;
     if (stmts.length === 0) {
-        if (!option.devel && special !== "ignore") {
+        if (!option.devel && special !== "_") {
             warn("empty_block", the_block);
         }
         the_block.disrupt = false;
@@ -2471,7 +2471,7 @@ constant("import", "function", function () {
     }
     return token;
 });
-constant("ignore", "undefined", function () {
+constant("_", "undefined", function () {
     warn("unexpected_a", token);
     return token;
 });
@@ -3280,7 +3280,7 @@ function do_var() {
         } else if (next_token.identifier) {
             const name = next_token;
             advance();
-            if (name.id === "ignore") {
+            if (name.id === "_") {
                 warn("unexpected_a", name);
             }
             enroll(name, "variable", is_const);
@@ -3468,7 +3468,7 @@ stmt("import", function () {
     if (next_token.identifier) {
         name = next_token;
         advance();
-        if (name.id === "ignore") {
+        if (name.id === "_") {
             warn("unexpected_a", name);
         }
         enroll(name, "variable", true);
@@ -3483,7 +3483,7 @@ stmt("import", function () {
                 }
                 name = next_token;
                 advance();
-                if (name.id === "ignore") {
+                if (name.id === "_") {
                     warn("unexpected_a", name);
                 }
                 enroll(name, "variable", true);
@@ -3545,7 +3545,7 @@ stmt("try", function () {
     the_try.block = block();
     the_disrupt = the_try.block.disrupt;
     if (next_token.id === "catch") {
-        let ignored = "ignore";
+        let ignored = "_";
         the_catch = next_token;
         the_try.catch = the_catch;
         advance("catch");
@@ -3554,7 +3554,7 @@ stmt("try", function () {
             if (!next_token.identifier) {
                 return stop("expected_identifier_a", next_token);
             }
-            if (next_token.id !== "ignore") {
+            if (next_token.id !== "_") {
                 ignored = undefined;
                 the_catch.name = next_token;
                 enroll(next_token, "exception", true);
@@ -4402,7 +4402,7 @@ postaction("unary", "+", function (thing) {
 
 function delve(the_function) {
     Object.keys(the_function.context).forEach(function (id) {
-        if (id !== "ignore") {
+        if (id !== "_") {
             const name = the_function.context[id];
             if (name.parent === the_function) {
                 if (
@@ -4864,7 +4864,7 @@ export default Object.freeze(function jslint(
     }
     return {
         directives,
-        edition: "2024-05-04",
+        edition: "2024-06-01",
         exports,
         froms,
         functions,
