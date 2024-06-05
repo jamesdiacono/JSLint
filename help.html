@@ -724,7 +724,7 @@ cases[<var>variable</var>]();</pre>
     <code>new Number</code>, <code>new String</code>, <code>new Boolean</code>.</p>
 <p>JSLint does not expect to see <code>new Object</code>.
     Use <code>Object.create(null)</code> instead.</p>
-<h1>Whitespace</h1>
+<h1 id=white>Whitespace</h1>
 <p>JSLint has a specific set of rules about the use of whitespace.
     Where possible, these rules are consistent with centuries of good practice
     with literary style.</p>
@@ -734,10 +734,9 @@ cases[<var>variable</var>]();</pre>
     <code>(</code>&nbsp;<small>left paren</small>. The matching closing
     token will be the first token on a line, restoring the previous
     indentation.</p>
-<p>The ternary operator can be visually confusing, so
-    <code>?</code>&nbsp;<small>question mark</small> and
-    <code>:</code>&nbsp;<small>colon</small>  always begin a line and increase
-    the indentation by 4 spaces.</p>
+<p>The ternary operator can be visually confusing, so always wrap it in parens.
+    The <code>?</code>&nbsp;<small>question mark</small> and
+    <code>:</code>&nbsp;<small>colon</small> each begin a line.</p>
 <pre>return (
     (the_token.id === "(string)" || the_token.id === "(number)")
     ? String(the_token.value)
