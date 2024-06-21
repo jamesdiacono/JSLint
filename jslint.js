@@ -1,5 +1,5 @@
 // jslint.js
-// 2024-06-01
+// 2024-06-21
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -115,7 +115,7 @@
     unexpected_parens, unexpected_space_a_b, unexpected_statement_a,
     unexpected_trailing_space, unexpected_typeof_a, uninitialized_a,
     unreachable_a, unregistered_property_a, unused_a, use_double, use_open,
-    use_spaces, used, value, var_loop, variable, warning, warnings,
+    use_spaces, used, value, var_loop, variable, warning, warnings, web,
     weird_condition_a, weird_expression_a, weird_loop, weird_relation_a, white,
     worker, wrap_condition, wrap_immediate, wrap_parameter, wrap_regexp,
     wrap_unary, wrapped, writable, y
@@ -144,28 +144,34 @@ const language = [
 
 // These are the globals that are provided by the language standard.
 
-    "Array", "ArrayBuffer", "Boolean", "DataView", "Date", "decodeURI",
-    "decodeURIComponent", "encodeURI", "encodeURIComponent", "Error",
-    "EvalError", "Float32Array", "Float64Array", "Generator",
-    "GeneratorFunction", "Int8Array", "Int16Array", "Int32Array", "Intl",
-    "JSON", "Map", "Math", "Number", "Object", "parseInt", "parseFloat",
-    "Promise", "Proxy", "RangeError", "ReferenceError", "Reflect", "RegExp",
-    "Set", "String", "Symbol", "SyntaxError", "System", "TypeError",
-    "Uint8Array", "Uint8ClampedArray", "Uint16Array", "Uint32Array",
-    "URIError", "WeakMap", "WeakSet"
+    "AggregateError", "Array", "ArrayBuffer", "Boolean", "DataView", "Date",
+    "decodeURI", "decodeURIComponent", "encodeURI", "encodeURIComponent",
+    "Error", "EvalError", "FinalizationRegistry", "Float32Array",
+    "Float64Array", "Int8Array", "Int16Array", "Int32Array", "Intl", "JSON",
+    "Map", "Math", "Number", "Object", "parseInt", "parseFloat", "Promise",
+    "Proxy", "RangeError", "ReferenceError", "Reflect", "RegExp", "Set",
+    "String", "Symbol", "SyntaxError", "TypeError", "Uint8Array",
+    "Uint8ClampedArray", "Uint16Array", "Uint32Array", "URIError", "WeakMap",
+    "WeakRef", "WeakSet"
 ];
 
 const web = [
 
-// These are the globals that are provided by various web standards.
+// These are the globals that are provided by web runtimes.
 
-    "AbortController", "atob", "Blob", "ByteLengthQueuingStrategy", "btoa",
-    "clearInterval", "clearTimeout", "CompressionStream",
-    "CountQueuingStrategy", "crypto", "DecompressionStream", "DOMException",
-    "Event", "fetch", "FormData", "Headers", "performance", "ReadableStream",
-    "Request", "Response", "setInterval", "setTimeout", "TextDecoder",
-    "TextDecoderStream", "TextEncoder", "TextEncoderStream", "TransformStream",
-    "URL", "URLSearchParams", "WebAssembly", "WritableStream"
+    "AbortController", "AbortSignal", "atob", "Blob", "btoa",
+    "ByteLengthQueuingStrategy", "clearInterval", "clearTimeout",
+    "CompressionStream", "CountQueuingStrategy", "Crypto", "crypto",
+    "CryptoKey", "DecompressionStream", "DOMException", "Event", "EventTarget",
+    "fetch", "File", "FormData", "Headers", "navigator", "performance",
+    "queueMicrotask", "ReadableByteStreamController", "ReadableStream",
+    "ReadableStreamBYOBReader", "ReadableStreamBYOBRequest",
+    "ReadableStreamDefaultController", "ReadableStreamDefaultReader", "Request",
+    "Response", "setInterval", "setTimeout", "structuredClone", "SubtleCrypto",
+    "TextDecoder", "TextDecoderStream", "TextEncoder", "TextEncoderStream",
+    "TransformStream", "TransformStreamDefaultController", "URL",
+    "URLSearchParams", "WebAssembly", "WritableStream",
+    "WritableStreamDefaultController"
 ];
 
 const allowed_option = {
@@ -176,25 +182,24 @@ const allowed_option = {
 // variables.
 
     bitwise: true,
-    browser: [
+    browser: web.concat([
         "caches", "cancelAnimationFrame", "CharacterData", "document",
         "DocumentType", "Element", "FileReader", "FontFace", "history",
         "IntersectionObserver", "localStorage", "location", "MutationObserver",
-        "navigator", "Node", "requestAnimationFrame", "ResizeObserver",
-        "screen", "sessionStorage", "WebSocket", "window", "Worker",
-        "XMLHttpRequest"
-    ].concat(web),
-    bun: [
-        "Bun", "navigator", "WebSocket", "Worker"
-    ],
+        "Node", "requestAnimationFrame", "ResizeObserver", "screen",
+        "sessionStorage", "WebSocket", "window", "Worker", "XMLHttpRequest"
+    ]),
+    bun: web.concat([
+        "Bun", "WebSocket", "Worker"
+    ]),
     couch: [
         "emit", "getRow", "isArray", "log", "provides", "registerType",
         "require", "send", "start", "sum", "toJSON"
     ],
-    deno: [
-        "Deno", "FileReader", "localStorage", "navigator", "sessionStorage",
-        "WebSocket", "window", "Worker"
-    ].concat(web),
+    deno: web.concat([
+        "Deno", "FileReader", "localStorage", "sessionStorage", "WebSocket",
+        "window", "Worker"
+    ]),
     devel: [
         "alert", "confirm", "console", "prompt"
     ],
@@ -202,17 +207,20 @@ const allowed_option = {
     fudge: true,
     getset: true,
     long: true,
-    node: [
-        "Buffer", "clearImmediate", "console", "exports", "module", "process",
-        "require", "setImmediate", "__dirname", "__filename"
-    ].concat(web),
+    node: web.concat([
+        "clearImmediate", "exports", "module", "require", "setImmediate",
+        "__dirname", "__filename"
+    ]),
     null: true,
     this: true,
-    tjs: [
-        "tjs", "navigator", "WebSocket", "Worker"
-    ].concat(web),
+    tjs: web.concat([
+        "tjs", "WebSocket", "Worker"
+    ]),
+    web,
     white: true,
-    worker: ["self"]
+    worker: [
+        "self"
+    ]
 };
 
 const anticondition = populate([
@@ -4864,7 +4872,7 @@ export default Object.freeze(function jslint(
     }
     return {
         directives,
-        edition: "2024-06-01",
+        edition: "2024-06-21",
         exports,
         froms,
         functions,

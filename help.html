@@ -350,16 +350,12 @@ a:active {
             <td><code>browser</code></td>
             <td><code>true</code> if the standard browser globals should be
                 predefined. This option disallows the file form of the
-                <code>&quot;use strict&quot;</code> pragma. It does not supply
-                <code>self</code>; you will have to request that unnecessary
-                alias of the dreaded global object yourself.
-            </td>
+                <code>&quot;use strict&quot;</code> pragma.</td>
         </tr>
         <tr>
             <td id="bun">Assume <a href="https://bun.sh/">Bun</a></td>
             <td><code>bun</code></td>
-            <td><code>true</code> if Bun globals should be predefined.
-            </td>
+            <td><code>true</code> if Bun globals should be predefined.</td>
         </tr>
         <tr>
             <td id="couch">Assume <a href="http://couchdb.apache.org/">CouchDB</a></td>
@@ -376,8 +372,7 @@ a:active {
         <tr>
             <td id="deno">Assume <a href="https://deno.land/">Deno</a></td>
             <td><code>deno</code></td>
-            <td><code>true</code> if Deno globals should be predefined.
-            </td>
+            <td><code>true</code> if Deno globals should be predefined.</td>
         </tr>
         <tr>
             <td id="devel">Assume in development</td>
@@ -422,15 +417,13 @@ a:active {
         <tr>
             <td id="node">Assume <a href="http://nodejs.org/">Node.js</a></td>
             <td><code>node</code></td>
-            <td><code>true</code> if Node.js globals should be predefined.
-            </td>
+            <td><code>true</code> if Node.js globals should be predefined.</td>
         </tr>
         <tr>
             <td id="null">Tolerate <code>null</code></td>
             <td><code>null</code></td>
             <td><code>true</code> if <code>null</code> should be allowed
                 anywhere except <code>Object.create(null)</code>.</td>
-            </td>
         </tr>
         <tr>
             <td id="this">Tolerate <code>this</code><br></td>
@@ -440,8 +433,13 @@ a:active {
         <tr>
             <td id="tjs">Assume <a href="https://github.com/saghul/txiki.js">Txiki</a></td>
             <td><code>tjs</code></td>
-            <td><code>true</code> if Txiki globals should be predefined.
-            </td>
+            <td><code>true</code> if Txiki globals should be predefined.</td>
+        </tr>
+        <tr>
+            <td id="web">Assume web</td>
+            <td><code>web</code></td>
+            <td><code>true</code> if the <a href="https://wintercg.org/">web globals</a>
+                should be predefined.</td>
         </tr>
         <tr>
             <td id="worker">Assume a Worker</td>
