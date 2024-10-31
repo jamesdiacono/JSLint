@@ -1,5 +1,5 @@
 // jslint.js
-// 2024-06-21
+// 2024-11-01
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -117,8 +117,8 @@
     unreachable_a, unregistered_property_a, unused_a, use_double, use_open,
     use_spaces, used, value, var_loop, variable, warning, warnings, web,
     weird_condition_a, weird_expression_a, weird_loop, weird_relation_a, white,
-    worker, wrap_condition, wrap_immediate, wrap_parameter, wrap_regexp,
-    wrap_unary, wrapped, writable, y
+    wrap_condition, wrap_immediate, wrap_parameter, wrap_regexp, wrap_unary,
+    wrapped, writable, y
 */
 
 function empty() {
@@ -183,11 +183,14 @@ const allowed_option = {
 
     bitwise: true,
     browser: web.concat([
-        "caches", "cancelAnimationFrame", "CharacterData", "document",
-        "DocumentType", "Element", "FileReader", "FontFace", "history",
-        "IntersectionObserver", "localStorage", "location", "MutationObserver",
-        "Node", "requestAnimationFrame", "ResizeObserver", "screen",
-        "sessionStorage", "WebSocket", "window", "Worker", "XMLHttpRequest"
+        "addEventListener", "AudioContext", "caches", "cancelAnimationFrame",
+        "CharacterData", "customElements", "document", "DocumentType",
+        "DOMParser", "Element", "FileReader", "FontFace", "getComputedStyle",
+        "history", "indexedDB", "IntersectionObserver", "isSecureContext",
+        "localStorage", "location", "matchMedia", "MutationObserver", "Node",
+        "postMessage", "removeEventListener", "requestAnimationFrame",
+        "ResizeObserver", "RTCPeerConnection", "screen", "sessionStorage",
+        "scrollTo", "WebSocket", "Worker", "XMLHttpRequest"
     ]),
     bun: web.concat([
         "Bun", "WebSocket", "Worker"
@@ -197,8 +200,8 @@ const allowed_option = {
         "require", "send", "start", "sum", "toJSON"
     ],
     deno: web.concat([
-        "Deno", "FileReader", "localStorage", "sessionStorage", "WebSocket",
-        "window", "Worker"
+        "addEventListener", "Deno", "FileReader", "localStorage",
+        "removeEventListener", "sessionStorage", "WebSocket", "Worker"
     ]),
     devel: [
         "alert", "confirm", "console", "prompt"
@@ -206,6 +209,9 @@ const allowed_option = {
     eval: true,
     fudge: true,
     getset: true,
+    global: [
+        "globalThis"
+    ],
     long: true,
     node: web.concat([
         "clearImmediate", "exports", "module", "require", "setImmediate",
@@ -217,10 +223,7 @@ const allowed_option = {
         "tjs", "WebSocket", "Worker"
     ]),
     web,
-    white: true,
-    worker: [
-        "self"
-    ]
+    white: true
 };
 
 const anticondition = populate([
@@ -4134,11 +4137,8 @@ postaction("binary", function (thing) {
                 warn("expected_a_b", thing, "String(...)", "+ \"\"");
             }
         } else if (thing.id === "[") {
-            if (left.id === "window") {
-                warn("weird_expression_a", thing, "window[...]");
-            }
-            if (left.id === "self") {
-                warn("weird_expression_a", thing, "self[...]");
+            if (left.id === "globalThis") {
+                warn("weird_expression_a", thing, "globalThis[...]");
             }
             if (
                 left.id === "."
@@ -4872,7 +4872,7 @@ export default Object.freeze(function jslint(
     }
     return {
         directives,
-        edition: "2024-06-21",
+        edition: "2024-11-01",
         exports,
         froms,
         functions,

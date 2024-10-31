@@ -410,6 +410,14 @@ a:active {
             <td><code>true</code> if accessor properties are allowed in object literals.</td>
         </tr>
         <tr>
+            <td id="global">Tolerate <code>globalThis</code></td>
+            <td><code>global</code></td>
+            <td><code>true</code> if <code>globalThis</code> should be allowed.
+                Use <code>globalThis</code> instead of <code>window</code>,
+                <code>self</code>, or <code>global</code>.
+            </td>
+        </tr>
+        <tr>
             <td id="long">Tolerate long source lines</td>
             <td><code>long</code></td>
             <td><code>true</code> if a line can contain more than 80 characters.</td>
@@ -440,12 +448,6 @@ a:active {
             <td><code>web</code></td>
             <td><code>true</code> if the <a href="https://wintercg.org/">web globals</a>
                 should be predefined.</td>
-        </tr>
-        <tr>
-            <td id="worker">Assume a Worker</td>
-            <td><code>worker</code></td>
-            <td><code>true</code> if Web Worker globals should be predefined.
-            </td>
         </tr>
         <tr>
             <td id="white">Tolerate whitespace mess</td>
