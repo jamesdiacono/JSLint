@@ -1,5 +1,5 @@
 // jslint.js
-// 2025-01-12
+// 2025-02-17
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -4004,7 +4004,14 @@ preaction("variable", function (thing) {
         const the_variable = lookup(thing);
         if (the_variable !== undefined) {
             thing.variable = the_variable;
-            the_variable.used += 1;
+
+// Referencing an outer function does not count as use.
+
+            if (stack.concat(functionage).every(function (outer) {
+                return outer.name !== the_variable;
+            })) {
+                the_variable.used += 1;
+            }
         }
     }
 });
@@ -4880,7 +4887,7 @@ export default Object.freeze(function jslint(
     }
     return {
         directives,
-        edition: "2025-01-12",
+        edition: "2025-02-17",
         exports,
         froms,
         functions,
