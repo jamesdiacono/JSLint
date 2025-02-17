@@ -187,10 +187,11 @@ const allowed_option = {
         "CharacterData", "customElements", "document", "DocumentType",
         "DOMParser", "Element", "FileReader", "FontFace", "getComputedStyle",
         "history", "indexedDB", "IntersectionObserver", "isSecureContext",
-        "localStorage", "location", "matchMedia", "MutationObserver", "Node",
-        "postMessage", "removeEventListener", "requestAnimationFrame",
-        "ResizeObserver", "RTCPeerConnection", "screen", "sessionStorage",
-        "scrollTo", "WebSocket", "Worker", "XMLHttpRequest"
+        "localStorage", "location", "matchMedia", "MediaRecorder",
+        "MutationObserver", "Node", "postMessage", "removeEventListener",
+        "requestAnimationFrame", "ResizeObserver", "RTCPeerConnection",
+        "screen", "sessionStorage", "scrollTo", "WebSocket", "Worker",
+        "XMLHttpRequest"
     ]),
     bun: web.concat([
         "Bun", "WebSocket", "Worker"
