@@ -1,5 +1,5 @@
 // jslint.js
-// 2025-02-17
+// 2025-05-12
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -113,12 +113,12 @@
     unexpected_at_top_level_a, unexpected_char_a, unexpected_comment,
     unexpected_directive_a, unexpected_expression_a, unexpected_label_a,
     unexpected_parens, unexpected_space_a_b, unexpected_statement_a,
-    unexpected_trailing_space, unexpected_typeof_a, uninitialized_a,
-    unreachable_a, unregistered_property_a, unused_a, use_double, use_open,
-    use_spaces, used, value, var_loop, variable, warning, warnings, web,
-    weird_condition_a, weird_expression_a, weird_loop, weird_relation_a, white,
-    wrap_condition, wrap_immediate, wrap_parameter, wrap_regexp, wrap_unary,
-    wrapped, writable, y
+    unexpected_trailing_space, unexpected_typeof_a, unexpected_var,
+    uninitialized_a, unreachable_a, unregistered_property_a, unused_a,
+    use_double, use_open, use_spaces, used, value, variable, warning, warnings,
+    web, weird_condition_a, weird_expression_a, weird_loop, weird_relation_a,
+    white, wrap_condition, wrap_immediate, wrap_parameter, wrap_regexp,
+    wrap_unary, wrapped, writable, y
 */
 
 function empty() {
@@ -357,6 +357,7 @@ const bundle = {
     unexpected_typeof_a: (
         "Unexpected 'typeof'. Use '===' to compare directly with {a}."
     ),
+    unexpected_var: "Unexpected var, use let or const instead.",
     uninitialized_a: "Uninitialized '{a}'.",
     unreachable_a: "Unreachable '{a}'.",
     unregistered_property_a: "Unregistered property name '{a}'.",
@@ -367,7 +368,6 @@ const bundle = {
         + "with a line break after the left paren."
     ),
     use_spaces: "Use spaces, not tabs.",
-    var_loop: "Don't declare variables in a loop.",
     weird_condition_a: "Weird condition '{a}'.",
     weird_expression_a: "Weird expression '{a}'.",
     weird_loop: "Weird loop.",
@@ -520,7 +520,6 @@ let token_nr;           // The number of the next token.
 let tokens;             // The array of tokens.
 let tenure;             // The predefined property registry.
 let tree;               // The abstract parse tree.
-let var_mode;           // "var" if using var; "let" if using let.
 let warnings;           // The array collecting all generated warnings.
 
 // Error reportage functions:
@@ -3214,29 +3213,8 @@ function do_var() {
     const the_statement = token;
     const is_const = the_statement.id === "const";
     the_statement.names = [];
-
-// A program may use var or let, but not both.
-
-    if (!is_const) {
-        if (var_mode === undefined) {
-            var_mode = the_statement.id;
-        } else if (the_statement.id !== var_mode) {
-            warn(
-                "expected_a_b",
-                the_statement,
-                var_mode,
-                the_statement.id
-            );
-        }
-    }
-
-// We don't expect to see vars created in loops.
-
-    if (functionage.loop > 0 && the_statement.id === "var") {
-        warn("var_loop", the_statement);
-    }
     (function next() {
-        if (next_token.id === "{" && the_statement.id !== "var") {
+        if (next_token.id === "{") {
             const the_brace = next_token;
             advance("{");
             (function pair() {
@@ -3262,7 +3240,7 @@ function do_var() {
             advance("}");
             advance("=");
             the_statement.expression = expression(0);
-        } else if (next_token.id === "[" && the_statement.id !== "var") {
+        } else if (next_token.id === "[") {
             const the_bracket = next_token;
             advance("[");
             (function element() {
@@ -3426,8 +3404,7 @@ stmt("export", function () {
             the_thing.statement = false;
             the_thing.arity = "unary";
         } else if (
-            next_token.id === "var"
-            || next_token.id === "let"
+            next_token.id === "let"
             || next_token.id === "const"
         ) {
             warn("unexpected_a", next_token);
@@ -3604,7 +3581,9 @@ stmt("try", function () {
     functionage.try -= 1;
     return the_try;
 });
-stmt("var", do_var);
+stmt("var", function () {
+    stop("unexpected_var", token);
+});
 stmt("while", function () {
     const the_while = token;
     not_top_level(the_while);
@@ -4360,7 +4339,6 @@ postaction("statement", "try", function (thing) {
         walk_statement(thing.catch.block);
     }
 });
-postaction("statement", "var", action_var);
 postaction("ternary", function (thing) {
     if (thing.wrapped !== true && thing.snug !== true) {
         warn("use_open", thing);
@@ -4827,7 +4805,6 @@ export default Object.freeze(function jslint(
         tenure = undefined;
         token = global;
         token_nr = 0;
-        var_mode = undefined;
         populate(language, declared_globals, false);
         populate(global_array, declared_globals, false);
         Object.keys(option).forEach(function (name) {
@@ -4887,7 +4864,7 @@ export default Object.freeze(function jslint(
     }
     return {
         directives,
-        edition: "2025-02-17",
+        edition: "2025-05-12",
         exports,
         froms,
         functions,
