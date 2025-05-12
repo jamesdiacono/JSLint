@@ -4330,13 +4330,17 @@ postaction("statement", "import", function (the_thing) {
 postaction("statement", "let", action_var);
 postaction("statement", "try", function (thing) {
     if (thing.catch !== undefined) {
-        const the_name = thing.catch.name;
-        if (the_name !== undefined) {
-            const the_variable = functionage.context[the_name.id];
+        const name = thing.catch.name;
+        let the_variable;
+        if (name !== undefined) {
+            the_variable = functionage.context[name.id];
             the_variable.dead = false;
             the_variable.init = true;
         }
         walk_statement(thing.catch.block);
+        if (the_variable !== undefined) {
+            the_variable.dead = true;
+        }
     }
 });
 postaction("ternary", function (thing) {
