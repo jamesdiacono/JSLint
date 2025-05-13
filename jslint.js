@@ -95,15 +95,15 @@
     expected_line_break_a_b, expected_regexp_factor_a, expected_space_a_b,
     expected_statements_a, expected_string_a, expected_type_string_a, exports,
     expression, extra, finally, flag, forEach, free, freeze, freeze_exports,
-    from, froms, fud, fudge, function_in_loop, g, getset, global, i, id,
-    identifier, import, indexOf, infix_in, init, isArray, isNaN, join, json,
+    from, froms, fud, fudge, function, function_in_loop, g, getset, global, i,
+    id, identifier, import, indexOf, infix_in, init, isArray, isNaN, join, json,
     keys, label, label_a, lbp, led, length, level, line, lines, live, long,
     loop, m, margin, match, message, misplaced_a, misplaced_directive_a,
     missing_browser, missing_m, module, naked_block, name, names,
     nested_comment, new, node, not_label_a, nr, nud, null, number_isNaN, ok,
-    open, opening, option, out_of_scope_a, parameters, parent, property, push,
-    quote, raw, redefinition_a_b, replace, required_a_optional_b, reserved_a,
-    role, search, shebang, shift, slice, snug, sort, split, startsWith,
+    open, opening, option, out_of_scope_a, parameters, property, push, quote,
+    raw, redefinition_a_b, replace, required_a_optional_b, reserved_a, role,
+    scope, search, shebang, shift, slice, snug, sort, split, startsWith,
     statement, stop, subscript_a, test, this, thru, tjs, todo_comment, tokens,
     too_long, too_many_digits, tree, try, type, u, unclosed_comment,
     unclosed_mega, unclosed_string, undeclared_a, unexpected_a,
@@ -493,6 +493,7 @@ function supplant(string, object) {
 let anon;               // The guessed name for anonymous functions.
 let blockage;           // The current block.
 let block_stack;        // The stack of blocks.
+let blocks;             // The array containing all of the blocks.
 let declared_globals;   // The object containing the global declarations.
 let directives;         // The directive comments.
 let directive_mode;     // true if directives are still allowed.
@@ -501,7 +502,6 @@ let exports;            // The exported names and values.
 let froms;              // The array collecting all import specifier strings.
 let fudge;              // The first natural number: 0 or 1.
 let functionage;        // The current function.
-let functions;          // The array containing all of the functions.
 let global;             // The global object; the outermost context.
 let json_mode;          // true if parsing JSON.
 let lines;              // The array containing source lines.
@@ -1810,7 +1810,7 @@ function json_value() {
 
 function enroll(name, role, readonly) {
 
-// Enroll a name into the current function context. The role can be exception,
+// Enroll a name into the current block context. The role can be exception,
 // function, label, parameter, or variable. We look for variable redefinition
 // because it causes confusion.
 
@@ -1824,7 +1824,7 @@ function enroll(name, role, readonly) {
 
 // Has the name been enrolled in this context?
 
-        let earlier = functionage.context[id];
+        let earlier = blockage.context[id];
         if (earlier) {
             warn(
                 "redefinition_a_b",
@@ -1836,7 +1836,7 @@ function enroll(name, role, readonly) {
 // Has the name been enrolled in an outer context?
 
         } else {
-            stack.every(function (value) {
+            block_stack.every(function (value) {
                 const item = value.context[id];
                 if (item !== undefined) {
                     earlier = item;
@@ -1869,11 +1869,12 @@ function enroll(name, role, readonly) {
 
 // Enroll it.
 
-            functionage.context[id] = name;
+            blockage.context[id] = name;
             name.dead = true;
-            name.parent = functionage;
+            name.function = functionage;
             name.init = false;
             name.role = role;
+            name.scope = blockage;
             name.used = 0;
             name.writable = !readonly;
         }
@@ -2164,6 +2165,10 @@ function block(special) {
     the_block = token;
     the_block.arity = "statement";
     the_block.body = special === "body";
+    the_block.context = empty();
+    block_stack.unshift(blockage);
+    blockage = the_block;
+    blocks.push(the_block);
 
 // Top level function bodies may include the "use strict" pragma.
 
@@ -2186,6 +2191,7 @@ function block(special) {
     } else {
         the_block.disrupt = stmts[stmts.length - 1].disrupt;
     }
+    blockage = block_stack.shift();
     advance("}");
     return the_block;
 }
@@ -2946,10 +2952,12 @@ function do_function(the_function) {
     the_function.loop = 0;
     the_function.try = 0;
 
-// Push the current function context and establish a new one.
+// Push the current context and establish a new one.
 
+    block_stack.unshift(blockage);
+    blockage = the_function;
+    blocks.push(the_function);
     stack.unshift(functionage);
-    functions.push(the_function);
     functionage = the_function;
     if (the_function.arity !== "statement" && typeof name === "object") {
         enroll(name, "function", true);
@@ -2992,6 +3000,7 @@ function do_function(the_function) {
 // Restore the previous context.
 
     functionage = stack.shift();
+    blockage = block_stack.shift();
     return the_function;
 }
 
@@ -3003,21 +3012,16 @@ function fart(parameters) {
     the_fart.arity = "binary";
     the_fart.name = "=>";
     the_fart.level = functionage.level + 1;
-    functions.push(the_fart);
     if (functionage.loop > 0) {
         warn("function_in_loop", the_fart);
     }
-
-// Give the function properties storing its names and for observing the depth
-// of loops.
-
     the_fart.context = empty();
     the_fart.finally = 0;
     the_fart.loop = 0;
     the_fart.try = 0;
-
-// Push the current function context and establish a new one.
-
+    block_stack.unshift(blockage);
+    blockage = the_fart;
+    blocks.push(the_fart);
     stack.unshift(functionage);
     functionage = the_fart;
     the_fart.parameters = parameters;
@@ -3031,6 +3035,7 @@ function fart(parameters) {
         the_fart.expression = expression(0);
     }
     functionage = stack.shift();
+    blockage = block_stack.shift();
     return the_fart;
 }
 
@@ -3174,17 +3179,17 @@ stmt("break", function () {
     }
     the_break.disrupt = true;
     if (next_token.identifier && token.line === next_token.line) {
-        the_label = functionage.context[next_token.id];
-        if (
-            the_label === undefined
-            || the_label.role !== "label"
-            || the_label.dead
-        ) {
-            warn(
-                (the_label !== undefined && the_label.dead)
-                ? "out_of_scope_a"
-                : "not_label_a"
-            );
+        block_stack.every(function (the_block) {
+            const a_label = the_block.context[next_token.id];
+            if (a_label !== undefined && a_label.role === "label") {
+                the_label = a_label;
+            }
+            return the_label === undefined && the_block.id === "{";
+        });
+        if (the_label === undefined) {
+            warn("not_label_a");
+        } else if (the_label.dead) {
+            warn("out_of_scope_a");
         } else {
             the_label.used += 1;
         }
@@ -3727,21 +3732,26 @@ function lookup(thing) {
 
 // Look up the variable in the current context.
 
-        let the_variable = functionage.context[thing.id];
+        let the_variable = blockage.context[thing.id];
 
 // If it isn't local, search all the other contexts. If there are name
 // collisions, take the most recent.
 
         if (the_variable === undefined) {
-            stack.every(function (outer) {
-                const a_variable = outer.context[thing.id];
+            let closure = false;
+            block_stack.every(function (the_block) {
+                const a_variable = the_block.context[thing.id];
                 if (
                     a_variable !== undefined
                     && a_variable.role !== "label"
                 ) {
                     the_variable = a_variable;
+                    return false;
                 }
-                return the_variable === undefined;
+                if (the_block.id === "function") {
+                    closure = true;
+                }
+                return true;
             });
 
 // If it isn't in any of those either, perhaps it is a predefined global.
@@ -3754,28 +3764,31 @@ function lookup(thing) {
                 }
                 the_variable = {
                     dead: false,
-                    parent: global,
+                    function: global,
                     id: thing.id,
                     init: true,
                     role: "variable",
+                    scope: global,
                     used: 0,
                     writable: false
                 };
                 global.context[thing.id] = the_variable;
             }
-            the_variable.closure = true;
-            functionage.context[thing.id] = the_variable;
+            if (closure) {
+                the_variable.closure = true;
+            }
+            blockage.context[thing.id] = the_variable;
         } else if (the_variable.role === "label") {
             warn("label_a", thing);
         }
         if (
             the_variable.dead
-            && stack.concat(functionage).every(function (outer) {
+            && stack.concat(functionage).every(function (the_function) {
                 return (
-                    outer.name === undefined
+                    the_function.name === undefined
                     || the_variable.calls === undefined
-                    || the_variable.calls[outer.name.id] === undefined
-                    || the_variable.parent !== outer.name.parent
+                    || the_variable.calls[the_function.name.id] === undefined
+                    || the_variable.function !== the_function.name.function
                 );
             })
         ) {
@@ -3796,10 +3809,10 @@ function preaction_function(thing) {
     if (thing.arity === "statement" && blockage.body !== true) {
         warn("unexpected_a", thing);
     }
-    stack.unshift(functionage);
     block_stack.unshift(blockage);
-    functionage = thing;
     blockage = thing;
+    stack.unshift(functionage);
+    functionage = thing;
     thing.live = [];
     if (typeof thing.name === "object") {
         thing.name.dead = false;
@@ -3951,8 +3964,8 @@ preaction("variable", function (thing) {
 
 // Referencing an outer function does not count as use.
 
-            if (stack.concat(functionage).every(function (outer) {
-                return outer.name !== the_variable;
+            if (stack.concat(functionage).every(function (the_function) {
+                return the_function.name !== the_variable;
             })) {
                 the_variable.used += 1;
             }
@@ -4295,10 +4308,13 @@ postaction("statement", "import", function (the_thing) {
 postaction("statement", "let", action_var);
 postaction("statement", "try", function (thing) {
     if (thing.catch !== undefined) {
-        const name = thing.catch.name;
-        let the_variable;
-        if (name !== undefined) {
-            the_variable = functionage.context[name.id];
+        const the_name = thing.catch.name;
+        const the_variable = (
+            the_name !== undefined
+            ? blockage.context[the_name.id]
+            : undefined
+        );
+        if (the_variable !== undefined) {
             the_variable.dead = false;
             the_variable.init = true;
         }
@@ -4370,16 +4386,16 @@ postaction("unary", "+", function (thing) {
     warn("expected_a_b", thing, "Number(...)", "+");
 });
 
-function delve(the_function) {
-    Object.keys(the_function.context).forEach(function (id) {
+function delve(the_block) {
+    Object.keys(the_block.context).forEach(function (id) {
         if (id !== "_") {
-            const name = the_function.context[id];
-            if (name.parent === the_function) {
+            const name = the_block.context[id];
+            if (name.scope === the_block) {
                 if (
                     name.used === 0
                     && (
                         name.role !== "function"
-                        || name.parent.arity !== "unary"
+                        || name.function.arity !== "unary"
                     )
                 ) {
                     warn("unused_a", name);
@@ -4393,7 +4409,7 @@ function delve(the_function) {
 
 function uninitialized_and_unused() {
 
-// Delve into the functions looking for variables that were not initialized
+// Delve into the scopes looking for variables that were not initialized
 // or used. If the file imports or exports, then its global object is also
 // delved.
 
@@ -4406,7 +4422,7 @@ function uninitialized_and_unused() {
     ) {
         delve(global);
     }
-    functions.forEach(delve);
+    blocks.forEach(delve);
 }
 
 // Go through the token list, looking at usage of whitespace.
@@ -4739,6 +4755,7 @@ export default Object.freeze(function jslint(
         option = Object.assign(empty(), option_object);
         anon = "anonymous";
         block_stack = [];
+        blocks = [];
         declared_globals = empty();
         directive_mode = true;
         directives = [];
@@ -4750,7 +4767,6 @@ export default Object.freeze(function jslint(
             ? 1
             : 0
         );
-        functions = [];
         global = {
             id: "(global)",
             body: true,
@@ -4809,6 +4825,7 @@ export default Object.freeze(function jslint(
             }
             tree = statements();
             advance("(end)");
+            blockage = global;
             functionage = global;
             walk_statement(tree);
             if (warnings.length === 0) {
@@ -4826,9 +4843,9 @@ export default Object.freeze(function jslint(
             });
         }
         early_stop = false;
-    } catch (e) {
-        if (e.name !== "JSLintError") {
-            warnings.push(e);
+    } catch (exception) {
+        if (exception.name !== "JSLintError") {
+            warnings.push(exception);
         }
     }
     return {
