@@ -1,15 +1,13 @@
 // report.js
-// 2018-10-22
+// 2025-05-13
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Generate JSLint HTML reports.
 
 /*property
-    closure, column, context, edition, error, exports, filter, forEach, freeze,
-    froms, fudge, function, functions, global, id, isArray, join, json, keys,
-    length, level, line, lines, message, module, name, names, option,
-    parameters, parent, property, push, replace, role, signature, sort, stop,
-    warnings
+    column, context, edition, error, exports, forEach, freeze, froms, fudge,
+    global, isArray, join, json, keys, length, line, lines, message, module,
+    option, property, push, replace, sort, stop, warnings
 */
 
 const rx_amp = /&/g;
@@ -35,7 +33,7 @@ function entityify(string) {
 }
 
 export default Object.freeze({
-    error: function error_report(data) {
+    error(data) {
 
 // Produce the HTML Error Report.
 
@@ -63,15 +61,10 @@ export default Object.freeze({
         return output.join("");
     },
 
-    function: function function_report(data) {
+    module(data) {
 
-// Produce the HTML Function Report.
+// Produce the HTML Module Report.
 
-// <dl class=LEVEL><address>LINE_NUMBER</address>FUNCTION_NAME_AND_SIGNATURE
-//     <dt>DETAIL</dt><dd>NAMES</dd>
-// </dl>
-
-        let fudge = Number(Boolean(data.option.fudge));
         let mode = (
             data.module
             ? "module"
@@ -99,90 +92,21 @@ export default Object.freeze({
             }
         }
 
-        if (data.functions.length === 0) {
-            output.push("<center>There are no functions.</center>");
-        }
         let global = Object.keys(data.global.context).sort();
         let froms = data.froms.sort();
         let exports = Object.keys(data.exports).sort();
         if (global.length + froms.length + exports.length > 0) {
-            output.push("<dl class=level0>");
+            output.push("<dl>");
             detail(mode, global);
             detail("import from", froms);
             detail("export", exports);
             output.push("</dl>");
-        }
-
-        if (data.functions.length > 0) {
-            data.functions.forEach(function (the_function) {
-                let context = the_function.context;
-                let list = Object.keys(context);
-                output.push(
-                    "<dl class=level",
-                    entityify(the_function.level),
-                    "><address>",
-                    entityify(the_function.line + fudge),
-                    "</address><dfn>",
-                    (
-                        the_function.name === "=>"
-                        ? entityify(the_function.signature) + " =>"
-                        : (
-                            typeof the_function.name === "string"
-                            ? "<b>«" + entityify(the_function.name) + "»</b>"
-                            : "<b>" + entityify(the_function.name.id) + "</b>"
-                        )
-                    ) + entityify(the_function.signature),
-                    "</dfn>"
-                );
-                if (Array.isArray(the_function.parameters)) {
-                    let params = [];
-                    the_function.parameters.forEach(function extract(name) {
-                        if (name.id === "{" || name.id === "[") {
-                            name.names.forEach(extract);
-                        } else {
-                            if (name.id !== "_") {
-                                params.push(name.id);
-                            }
-                        }
-                    });
-                    detail(
-                        "parameter",
-                        params.sort()
-                    );
-                }
-                list.sort();
-                detail("variable", list.filter(function (id) {
-                    let the_variable = context[id];
-                    return (
-                        the_variable.role === "variable"
-                        && the_variable.parent === the_function
-                    );
-                }));
-                detail("exception", list.filter(function (id) {
-                    return context[id].role === "exception";
-                }));
-                detail("closure", list.filter(function (id) {
-                    let the_variable = context[id];
-                    return (
-                        the_variable.closure === true
-                        && the_variable.parent === the_function
-                    );
-                }));
-                detail("outer", list.filter(function (id) {
-                    let the_variable = context[id];
-                    return (
-                        the_variable.parent !== the_function
-                        && the_variable.parent.id !== "(global)"
-                    );
-                }));
-                detail(mode, list.filter(function (id) {
-                    return context[id].parent.id === "(global)";
-                }));
-                detail("label", list.filter(function (id) {
-                    return context[id].role === "label";
-                }));
-                output.push("</dl>");
-            });
+        } else {
+            output.push(
+                "<center>",
+                "There are no imports, exports, or global variables.",
+                "</center>"
+            );
         }
         output.push(
             "<center>JSLint edition ",
@@ -192,7 +116,7 @@ export default Object.freeze({
         return output.join("");
     },
 
-    property: function property_directive(data) {
+    property(data) {
 
 // Produce the /*property*/ directive.
 

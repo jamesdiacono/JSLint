@@ -758,25 +758,8 @@ cases[<var>variable</var>]();</pre>
     again before you commit. Maybe someday we will finally get a universal
     standard for tabs, but until that day comes, the better choice is spaces.</p>
 <h1 id=report>Report</h1>
-<p>If JSLint is able to complete its scan, it generates a function
-    report. It lists for each function:</p>
-<ul>
-    <li>The line number on which it starts.</li>
-    <li>The function&rsquo;s name. In the case of anonymous functions,
-        JSLint will attempt to
-        <code>«</code>guess<code>»</code> the name.</li>
-    <li>The parameters.</li>
-    <li><i>Variables</i>: The variables that are declared in the function.</li>
-    <li><i>Closure</i>: The variables and parameters that are declared in
-        the function that are used by its inner functions.</li>
-    <li><i>Exceptions</i>: The variables that are declared by <code>catch</code>
-        clauses of <code>try</code> statements.</li>
-    <li><i>Outer</i>: Variables used by this function that are declared in
-        other functions.</li>
-    <li><i>Global</i>: Global variables that are used by this function. Keep
-        these to a minimum.</li>
-    <li><i>Label</i>: Statement labels that are used by this function.</li>
-</ul>
+<p>If JSLint is able to complete its scan, it generates a report listing
+    all imports, exports, and global variables.</p>
 <p>The report will also include a list of all of the property
     names that were used.</p>
 <h1 id=feedback>Feedback</h1>

@@ -1,5 +1,5 @@
 // browser.js
-// 2018-06-16
+// 2025-05-13
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 /*jslint
@@ -7,9 +7,9 @@
 */
 
 /*property
-    checked, create, disable, display, error, focus, forEach, function,
-    getElementById, innerHTML, join, length, map, onchange, onclick, onscroll,
-    property, querySelectorAll, scrollTop, select, split, style, title, value
+    checked, create, disable, display, error, focus, forEach, getElementById,
+    innerHTML, join, length, map, module, onchange, onclick, onscroll, property,
+    querySelectorAll, scrollTop, select, split, style, title, value
 */
 
 import jslint from "./jslint.js";
@@ -96,7 +96,7 @@ function call_jslint() {
 // Generate the reports.
 
     let error_html = report.error(result);
-    let function_html = report.function(result);
+    let module_html = report.module(result);
     let property_text = report.property(result);
 
 // Display the reports.
@@ -108,7 +108,7 @@ function call_jslint() {
         : "block"
     );
 
-    report_list.innerHTML = function_html;
+    report_list.innerHTML = module_html;
     report_field.style.display = "block";
     if (property_text) {
         property.value = property_text;

@@ -189,8 +189,8 @@ a:link {
     margin-left: 1em;
 }
 #JSLINT_ dl {
-    background-color: cornsilk;
-    color: white;
+    color: black;
+    background-color: white;
     margin: 0;
     padding-bottom: 2pt;
     padding-left: 1em;
@@ -264,73 +264,8 @@ a:link {
     margin-top: 1em;
 }
 
-#JSLINT_WARNINGS dl address {
-    color: black;
-    display: inline;
-    float: none;
-    font-size: 80%;
-    margin: 0;
-}
-
 #JSLINT_REPORT>div {
     padding: 1em;
-}
-
-#JSLINT_ dl.level0 {
-    color: black;
-    background-color: white;
-}
-
-#JSLINT_ dl.level1 {
-    color: black;
-    background-color: #ffffe0;  /* yellow */
-    margin-left: 1em;
-}
-
-#JSLINT_ dl.level2 {
-    color: black;
-    background-color: #e0ffe0;  /* green */
-    margin-left: 2em;
-}
-
-#JSLINT_ dl.level3 {
-    color: black;
-    background-color: #D0D0ff;  /* blue */
-    margin-left: 3em;
-}
-
-#JSLINT_ dl.level4 {
-    background-color: #ffe0ff;  /* purple */
-    color: black;
-    margin-left: 4em;
-}
-
-#JSLINT_ dl.level5 {
-    background-color: #ffe0e0;  /* red */
-    color: black;
-    margin-left: 5em;
-}
-
-#JSLINT_ dl.level6 {
-    background-color: #ffe390;  /* orange */
-    color: black;
-    margin-left: 6em;
-}
-
-#JSLINT_ dl.level7 {
-    background-color: #e0e0e0;  /* gray */
-    color: black;
-    margin-left: 7em;
-}
-
-#JSLINT_ dl.level8 {
-    color: black;
-    margin-left: 8em;
-}
-
-#JSLINT_ dl.level9 {
-    color: black;
-    margin-left: 9em;
 }
 
 .none {

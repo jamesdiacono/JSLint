@@ -1,5 +1,5 @@
 // jslint.js
-// 2025-05-12
+// 2025-05-13
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -38,8 +38,6 @@
 //      edition: the version of JSLint that did the analysis.
 //      exports: the names exported from the module.
 //      froms: an array of strings representing each of the imports.
-//      functions: an array of objects that represent all of the functions
-//              declared in the file.
 //      global: an object representing the global object. Its .context property
 //              is an object containing a property for each global variable.
 //      id: "(JSLint)"
@@ -97,28 +95,28 @@
     expected_line_break_a_b, expected_regexp_factor_a, expected_space_a_b,
     expected_statements_a, expected_string_a, expected_type_string_a, exports,
     expression, extra, finally, flag, forEach, free, freeze, freeze_exports,
-    from, froms, fud, fudge, function_in_loop, functions, g, getset, global, i,
-    id, identifier, import, indexOf, infix_in, init, isArray, isNaN, join, json,
+    from, froms, fud, fudge, function_in_loop, g, getset, global, i, id,
+    identifier, import, indexOf, infix_in, init, isArray, isNaN, join, json,
     keys, label, label_a, lbp, led, length, level, line, lines, live, long,
     loop, m, margin, match, message, misplaced_a, misplaced_directive_a,
     missing_browser, missing_m, module, naked_block, name, names,
     nested_comment, new, node, not_label_a, nr, nud, null, number_isNaN, ok,
     open, opening, option, out_of_scope_a, parameters, parent, property, push,
     quote, raw, redefinition_a_b, replace, required_a_optional_b, reserved_a,
-    role, search, shebang, shift, signature, slice, snug, sort, split,
-    startsWith, statement, stop, subscript_a, test, this, thru, tjs,
-    todo_comment, tokens, too_long, too_many_digits, tree, try, type, u,
-    unclosed_comment, unclosed_mega, unclosed_string, undeclared_a,
-    unexpected_a, unexpected_a_after_b, unexpected_a_before_b,
-    unexpected_at_top_level_a, unexpected_char_a, unexpected_comment,
-    unexpected_directive_a, unexpected_expression_a, unexpected_label_a,
-    unexpected_parens, unexpected_space_a_b, unexpected_statement_a,
-    unexpected_trailing_space, unexpected_typeof_a, unexpected_var,
-    uninitialized_a, unreachable_a, unregistered_property_a, unshift, unused_a,
-    use_double, use_open, use_spaces, used, value, variable, warning, warnings,
-    web, weird_condition_a, weird_expression_a, weird_loop, weird_relation_a,
-    white, wrap_condition, wrap_immediate, wrap_parameter, wrap_regexp,
-    wrap_unary, wrapped, writable, y
+    role, search, shebang, shift, slice, snug, sort, split, startsWith,
+    statement, stop, subscript_a, test, this, thru, tjs, todo_comment, tokens,
+    too_long, too_many_digits, tree, try, type, u, unclosed_comment,
+    unclosed_mega, unclosed_string, undeclared_a, unexpected_a,
+    unexpected_a_after_b, unexpected_a_before_b, unexpected_at_top_level_a,
+    unexpected_char_a, unexpected_comment, unexpected_directive_a,
+    unexpected_expression_a, unexpected_label_a, unexpected_parens,
+    unexpected_space_a_b, unexpected_statement_a, unexpected_trailing_space,
+    unexpected_typeof_a, unexpected_var, uninitialized_a, unreachable_a,
+    unregistered_property_a, unshift, unused_a, use_double, use_open,
+    use_spaces, used, value, variable, warning, warnings, web,
+    weird_condition_a, weird_expression_a, weird_loop, weird_relation_a, white,
+    wrap_condition, wrap_immediate, wrap_parameter, wrap_regexp, wrap_unary,
+    wrapped, writable, y
 */
 
 function empty() {
@@ -2773,7 +2771,6 @@ function default_expression() {
 function parameter_list() {
     const list = [];
     let optional;
-    const signature = ["("];
     if (next_token.id !== ")" && next_token.id !== "(end)") {
         (function parameter() {
             let ellipsis = false;
@@ -2790,7 +2787,6 @@ function parameter_list() {
                 param = next_token;
                 param.names = [];
                 advance("{");
-                signature.push("{");
                 (function subparameter() {
                     let subparam = next_token;
                     if (!subparam.identifier) {
@@ -2798,7 +2794,6 @@ function parameter_list() {
                     }
                     survey(subparam);
                     advance();
-                    signature.push(subparam.id);
                     if (next_token.id === "=") {
                         advance("=");
                         subparam.expression = default_expression();
@@ -2807,16 +2802,13 @@ function parameter_list() {
                     param.names.push(subparam);
                     if (next_token.id === ",") {
                         advance(",");
-                        signature.push(", ");
                         return subparameter();
                     }
                 }());
                 list.push(param);
                 advance("}");
-                signature.push("}");
                 if (next_token.id === ",") {
                     advance(",");
-                    signature.push(", ");
                     return parameter();
                 }
             } else if (next_token.id === "[") {
@@ -2831,7 +2823,6 @@ function parameter_list() {
                 param = next_token;
                 param.names = [];
                 advance("[");
-                signature.push("[]");
                 (function subparameter() {
                     const subparam = next_token;
                     if (!subparam.identifier) {
@@ -2853,13 +2844,11 @@ function parameter_list() {
                 advance("]");
                 if (next_token.id === ",") {
                     advance(",");
-                    signature.push(", ");
                     return parameter();
                 }
             } else {
                 if (next_token.id === "...") {
                     ellipsis = true;
-                    signature.push("...");
                     advance("...");
                     if (optional !== undefined) {
                         warn(
@@ -2876,7 +2865,6 @@ function parameter_list() {
                 param = next_token;
                 list.push(param);
                 advance();
-                signature.push(param.id);
                 if (ellipsis) {
                     param.ellipsis = true;
                 } else {
@@ -2896,7 +2884,6 @@ function parameter_list() {
                     }
                     if (next_token.id === ",") {
                         advance(",");
-                        signature.push(", ");
                         return parameter();
                     }
                 }
@@ -2904,8 +2891,7 @@ function parameter_list() {
         }());
     }
     advance(")");
-    signature.push(")");
-    return [list, signature.join("")];
+    return list;
 }
 
 function do_function(the_function) {
@@ -2977,7 +2963,7 @@ function do_function(the_function) {
     advance("(");
     token.free = false;
     token.arity = "function";
-    [functionage.parameters, functionage.signature] = parameter_list();
+    functionage.parameters = parameter_list();
     functionage.parameters.forEach(function enroll_parameter(name) {
         if (name.identifier) {
             enroll(name, "parameter", false);
@@ -3011,7 +2997,7 @@ function do_function(the_function) {
 
 prefix("function", do_function);
 
-function fart(pl) {
+function fart(parameters) {
     advance("=>");
     const the_fart = token;
     the_fart.arity = "binary";
@@ -3034,8 +3020,7 @@ function fart(pl) {
 
     stack.unshift(functionage);
     functionage = the_fart;
-    the_fart.parameters = pl[0];
-    the_fart.signature = pl[1];
+    the_fart.parameters = parameters;
     the_fart.parameters.forEach(function (name) {
         enroll(name, "parameter", true);
     });
@@ -3081,7 +3066,7 @@ prefix("(", function () {
             return stop("expected_identifier_a", the_value);
         }
         the_paren.expression = [the_value];
-        return fart([the_paren.expression, "(" + the_value.id + ")"]);
+        return fart(the_paren.expression);
     }
     return the_value;
 });
@@ -4848,10 +4833,9 @@ export default Object.freeze(function jslint(
     }
     return {
         directives,
-        edition: "2025-05-12",
+        edition: "2025-05-13",
         exports,
         froms,
-        functions,
         global,
         id: "(JSLint)",
         json: json_mode,

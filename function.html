@@ -245,8 +245,6 @@ a:active {
     <td>All of the exported names and values.</td></tr>
 <tr><td><code>froms</code></td><td>array</td>
     <td>All of the strings named in <code>import</code> statements.</td></tr>
-<tr><td><code>functions</code></td><td>array</td>
-    <td>An array of function objects.</td></tr>
 <tr><td><code>global</code></td><td>object</td>
     <td>The global object, a body that contains the outermost statements and
         variables.</td></tr>
@@ -503,6 +501,12 @@ a:active {
             <td>identifier</td>
         </tr>
         <tr>
+            <td><code>scope</code></td>
+            <td>token</td>
+            <td>The block in which the variable was declared.</td>
+            <td>variable</td>
+        </tr>
+        <tr>
             <td><code>shebang</code></td>
             <td>string</td>
             <td>The first line of text if it started with <code>#!</code></td>
@@ -574,9 +578,9 @@ a:active {
                 from the warnings that are found.</td>
         </tr>
         <tr>
-            <td><code>function</code></td>
+            <td><code>module</code></td>
             <td>This function takes a result and returns an HTML text fragment
-                detailing the declarations of every function.</td>
+                detailing the imports, exports, and global variables.</td>
         </tr>
         <tr>
             <td><code>property</code></td>
