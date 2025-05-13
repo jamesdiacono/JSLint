@@ -103,9 +103,9 @@
     loop, m, margin, match, message, misplaced_a, misplaced_directive_a,
     missing_browser, missing_m, module, naked_block, name, names,
     nested_comment, new, node, not_label_a, nr, nud, null, number_isNaN, ok,
-    open, opening, option, out_of_scope_a, parameters, parent, pop, property,
-    push, quote, raw, redefinition_a_b, replace, required_a_optional_b,
-    reserved_a, role, search, shebang, signature, slice, snug, sort, split,
+    open, opening, option, out_of_scope_a, parameters, parent, property, push,
+    quote, raw, redefinition_a_b, replace, required_a_optional_b, reserved_a,
+    role, search, shebang, shift, signature, slice, snug, sort, split,
     startsWith, statement, stop, subscript_a, test, this, thru, tjs,
     todo_comment, tokens, too_long, too_many_digits, tree, try, type, u,
     unclosed_comment, unclosed_mega, unclosed_string, undeclared_a,
@@ -114,7 +114,7 @@
     unexpected_directive_a, unexpected_expression_a, unexpected_label_a,
     unexpected_parens, unexpected_space_a_b, unexpected_statement_a,
     unexpected_trailing_space, unexpected_typeof_a, unexpected_var,
-    uninitialized_a, unreachable_a, unregistered_property_a, unused_a,
+    uninitialized_a, unreachable_a, unregistered_property_a, unshift, unused_a,
     use_double, use_open, use_spaces, used, value, variable, warning, warnings,
     web, weird_condition_a, weird_expression_a, weird_loop, weird_relation_a,
     white, wrap_condition, wrap_immediate, wrap_parameter, wrap_regexp,
@@ -1838,11 +1838,12 @@ function enroll(name, role, readonly) {
 // Has the name been enrolled in an outer context?
 
         } else {
-            stack.forEach(function (value) {
+            stack.every(function (value) {
                 const item = value.context[id];
                 if (item !== undefined) {
                     earlier = item;
                 }
+                return earlier === undefined;
             });
             if (earlier) {
                 if (id === "_") {
@@ -2961,7 +2962,7 @@ function do_function(the_function) {
 
 // Push the current function context and establish a new one.
 
-    stack.push(functionage);
+    stack.unshift(functionage);
     functions.push(the_function);
     functionage = the_function;
     if (the_function.arity !== "statement" && typeof name === "object") {
@@ -3004,7 +3005,7 @@ function do_function(the_function) {
 
 // Restore the previous context.
 
-    functionage = stack.pop();
+    functionage = stack.shift();
     return the_function;
 }
 
@@ -3031,7 +3032,7 @@ function fart(pl) {
 
 // Push the current function context and establish a new one.
 
-    stack.push(functionage);
+    stack.unshift(functionage);
     functionage = the_fart;
     the_fart.parameters = pl[0];
     the_fart.signature = pl[1];
@@ -3044,7 +3045,7 @@ function fart(pl) {
     } else {
         the_fart.expression = expression(0);
     }
-    functionage = stack.pop();
+    functionage = stack.shift();
     return the_fart;
 }
 
@@ -3747,7 +3748,7 @@ function lookup(thing) {
 // collisions, take the most recent.
 
         if (the_variable === undefined) {
-            stack.forEach(function (outer) {
+            stack.every(function (outer) {
                 const a_variable = outer.context[thing.id];
                 if (
                     a_variable !== undefined
@@ -3755,6 +3756,7 @@ function lookup(thing) {
                 ) {
                     the_variable = a_variable;
                 }
+                return the_variable === undefined;
             });
 
 // If it isn't in any of those either, perhaps it is a predefined global.
@@ -3809,8 +3811,8 @@ function preaction_function(thing) {
     if (thing.arity === "statement" && blockage.body !== true) {
         warn("unexpected_a", thing);
     }
-    stack.push(functionage);
-    block_stack.push(blockage);
+    stack.unshift(functionage);
+    block_stack.unshift(blockage);
     functionage = thing;
     blockage = thing;
     thing.live = [];
@@ -3863,7 +3865,7 @@ function pop_block() {
         name.dead = true;
     });
     delete blockage.live;
-    blockage = block_stack.pop();
+    blockage = block_stack.shift();
 }
 
 function activate(name) {
@@ -3924,28 +3926,6 @@ preaction("binary", "||", function (thing) {
         }
     });
 });
-preaction("binary", "(", function (thing) {
-    const left = thing.expression[0];
-    if (
-        left.identifier
-        && functionage.context[left.id] === undefined
-        && typeof functionage.name === "object"
-    ) {
-        const parent = functionage.name.parent;
-        if (parent) {
-            const left_variable = parent.context[left.id];
-            if (
-                left_variable !== undefined
-                && left_variable.dead
-                && left_variable.parent === parent
-                && left_variable.calls !== undefined
-                && left_variable.calls[functionage.name.id] !== undefined
-            ) {
-                left_variable.dead = false;
-            }
-        }
-    }
-});
 preaction("binary", "[", function (thing) {
     thing.expression[1].snug = true;
 });
@@ -3961,7 +3941,7 @@ preaction("binary", ".", function (thing) {
     }
 });
 preaction("statement", "{", function (thing) {
-    block_stack.push(blockage);
+    block_stack.unshift(blockage);
     blockage = thing;
     thing.live = [];
 });
@@ -4082,7 +4062,7 @@ function postaction_function(thing) {
     delete functionage.finally;
     delete functionage.loop;
     delete functionage.try;
-    functionage = stack.pop();
+    functionage = stack.shift();
     if (thing.wrapped) {
         warn("unexpected_parens", thing);
     }
@@ -4457,7 +4437,7 @@ function whitage() {
     let right;
 
     function pop() {
-        const previous = stack.pop();
+        const previous = stack.shift();
         closer = previous.closer;
         free = previous.free;
         margin = previous.margin;
@@ -4466,7 +4446,7 @@ function whitage() {
     }
 
     function push() {
-        stack.push({
+        stack.unshift({
             closer,
             free,
             margin,
