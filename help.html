@@ -241,43 +241,8 @@ a:active {
     all of JSLint's advice.</p>
 <p>JSLint can operate on JavaScript source
     or <a href="http://www.JSON.org/">JSON</a> text.</p>
-<h1 id=es6>ECMAScript Sixth Edition</h1>
-<p>Some of
-    ES6&rsquo;s features are good, so JSLint will recognize the good
-    parts of ES6. </p>
-<p>Currently, these features are recognized:</p>
-<ul>
-    <li>The <code>...</code>&nbsp;<small>ellipsis</small> marker in parameter
-        lists and argument lists, replacing the <code>arguments</code> object
-        for variadic functions.</li>
-    <li>The <code>let</code> statement, which is like the <code>var</code>
-        statement except that it respects block scope.
-        You may use <code>let</code> or <code>var</code> but not both.</li>
-    <li>The <code>const</code> statement is like the <code>let</code> statement
-        except that it disallows the use of assignment on the variable, although
-        if the value of the variable is mutable, it can still be mutated.
-        <code>const</code> is preferred to <code>let</code>.
-    <li>Destructuring of arrays and objects is allowed in parameter lists and on
-        the left side of <code>let</code>, and <code>const</code>, but not
-        <code>var</code> or assignment statements, and  not deep destructuring
-        or eliding.</li>
-    <li>Enhanced object literals, providing shorter forms for function
-        declaration and properties that are initialized by variables with the
-        same name.</li>
-    <li>The fat arrow <code>=></code>&nbsp;<small>fart</small> functions.</li>
-    <li>The simplest forms of <code>import</code> and <code>export</code>.</li>
-    <li><code>`</code>Megastring<code>`</code> literals, but not nested
-        <code>`</code>megastring<code>`</code> literals.</li>
-    <li>New global functions, such as <code>Map</code>, <code>Set</code>,
-        <code>WeakMap</code>, and <code>WeakSet</code>.</li>
-    <li><code>0b</code>- and <code>0o</code>- number literals.</li>
-</ul>
-<p>The most important new feature of ES6 is proper tail calls. This has no
-    new syntax, so JSLint doesn&rsquo;t see it. But it makes recursion
-    much more attractive, which makes loops, particularly <code>for</code>
-    loops, much less attractive.</p>
 <h1 id="import"><code>import export</code></h1>
-<p>The ES6 module feature will be an important improvement over JavaScript&rsquo;s
+<p>Modules are an important improvement over JavaScript&rsquo;s
     global variables as a means of linking separate files together.
     JSLint recognizes a small but essential subset of the module
     syntax.</p>
@@ -317,13 +282,7 @@ a:active {
 <p>instructs JSLint to not give warnings about the global
     variables <code>ADsafe</code>, <code>report</code>, and <code>jslint</code>.
     However, if any of those names are expected to be supplied by other files
-    and those other files fail to do so, then execution errors will result. It
-    is usually better to use top-level variable declarations instead:
-<pre>    var ADSAFE;
-    var report;
-    var jslint; </pre>
-<p>Using <code>var</code> in this way allows comparing a global variable to the
-    <code>undefined</code> value to determine whether it is has been used in the global context.</p>
+    and those other files fail to do so, then execution errors will result.
 <h1><code>/*jslint*/</code></h1>
 <p>The <code>/*jslint*/</code> directive allows for the control of several
     options. These options can also be set from the
@@ -492,19 +451,14 @@ a:active {
 <h1 id=var><code>var let const</code></h1>
 <p>JavaScript provides three statements for declaring variables:
     <code>var</code>, <code>let</code>, and <code>const</code>. The
-    <code>var</code> statement suffers from a bad practice called hoisting. The
-    <code>let</code> statement does not do hoisting and respects block scope.
-    The <code>const</code> statement is like <code>let</code> except that it
-    marks the variable (but not its contents) as read only, making it an error
-    to attempt to assign to the variable. When given a choice,
-    <code>const</code> is the best, <code>var</code> is the worst. </p>
-<p>JSLint uses the intersection of the <code>var</code> rules and the
-    <code>let</code> rules, and by doing so avoids the errors related to either.
-    A name should be declared only once in a function. It should be declared
-    before it is used. It should not be used outside of the block in which it is
-    declared. A variable should not have the same name as a variable or
-    parameter in an outer function. Do not mix <code>var</code> and
-    <code>let</code>. Declare one name per statement.</p>
+    <code>var</code> statement suffers from a bad practice called hoisting and
+    does not respect block scope. The <code>let</code> statement does not do
+    hoisting and respects block scope. The <code>const</code> statement is like
+    <code>let</code> except that it marks the variable (but not its contents)
+    as read only, making it an error to attempt to assign to the variable. When
+    given a choice, <code>const</code> is the best, <code>var</code> is the
+    worst.</p>
+<p>JSLint does not expect to see a <code>var</code> statement.</p>
 <h1 id=eq><code>= == ===</code></h1>
 <p><span style="font-variant: small-caps;">Fortran</span> made a terrible
     mistake in using the equality operator as its assignment operator. That
@@ -546,7 +500,7 @@ a:active {
 <blockquote> <code>function (</code><var>parameters</var><code>) {</code>
     <div><var>statements</var></div>
     <code>}</code> </blockquote>
-<p>The enhanced object literal provides an ES6 shorthand for creating a property
+<p>The enhanced object literal provides a shorthand for creating a property
     whose value is a function, saving you from having to type
     <code>:</code>&nbsp;<small>colon</small> and <code>function</code>.</p>
 <blockquote> <code>{</code>
@@ -554,7 +508,7 @@ a:active {
         <div><var>statements</var></div>
         <code>}</code></div>
     <code>}</code> </blockquote>
-<p>Finally, ES6 provides an even shorter form of function expression that leaves
+<p>There is an even shorter form of function expression that leaves
     out the words <code>function</code> and <code>return</code>:</p>
 <blockquote> <code>(</code><var>parameters</var><code>) =>
     </code><var>expression</var> </blockquote>
@@ -638,19 +592,6 @@ while (<var>condition</var>) {
 } else {
     <var>statements;</var>
 }</pre>
-    <p>Alternatively, an object can be filled with functions representing the
-    different cases.</p>
-<pre>const cases = {
-    <var>case_a</var>() {
-        <var>statements;</var>
-    },
-    <var>case_b</var>() {
-        <var>statements;</var>
-    }
-};
-cases[<var>variable</var>]();</pre>
-    <p>If none of the functions are matched, an exception gets raised
-    automatically.</p>
     <p>JSLint does not expect to see a <code>switch</code> statement.</p>
 <h1 id=with><code>with</code></h1>
 <p>The <code>with</code> statement was intended to provide a shorthand in
