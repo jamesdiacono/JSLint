@@ -1,5 +1,5 @@
 // jslint.js
-// 2025-05-28
+// 2026-02-09
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -160,10 +160,10 @@ const web = [
     "AbortController", "AbortSignal", "atob", "Blob", "btoa",
     "ByteLengthQueuingStrategy", "clearInterval", "clearTimeout",
     "CompressionStream", "CountQueuingStrategy", "Crypto", "crypto",
-    "CryptoKey", "DecompressionStream", "DOMException", "Event", "EventTarget",
-    "fetch", "File", "FormData", "Headers", "navigator", "performance",
-    "queueMicrotask", "ReadableByteStreamController", "ReadableStream",
-    "ReadableStreamBYOBReader", "ReadableStreamBYOBRequest",
+    "CryptoKey", "DecompressionStream", "DOMException", "Event", "EventSource",
+    "EventTarget", "fetch", "File", "FormData", "Headers", "navigator",
+    "performance", "queueMicrotask", "ReadableByteStreamController",
+    "ReadableStream", "ReadableStreamBYOBReader", "ReadableStreamBYOBRequest",
     "ReadableStreamDefaultController", "ReadableStreamDefaultReader", "Request",
     "Response", "setInterval", "setTimeout", "structuredClone", "SubtleCrypto",
     "TextDecoder", "TextDecoderStream", "TextEncoder", "TextEncoderStream",
@@ -4851,7 +4851,7 @@ export default Object.freeze(function jslint(
     }
     return {
         directives,
-        edition: "2025-05-28",
+        edition: "2026-02-09",
         exports,
         froms,
         global,
