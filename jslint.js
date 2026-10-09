@@ -1,5 +1,5 @@
 // jslint.js
-// 2026-09-29
+// 2026-10-09
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -2217,7 +2217,7 @@ function mutation_check(the_thing) {
     return true;
 }
 
-function left_check(left, right, chained = false) {
+function left_check(left, right) {
 
 // Warn if the left is not one of these:
 //      e.b
@@ -2241,7 +2241,7 @@ function left_check(left, right, chained = false) {
             left.arity !== "binary"
             || (
                 id !== "."
-                && (id !== "?." || chained)
+                && id !== "?."
                 && id !== "("
                 && id !== "["
             )
@@ -2251,6 +2251,25 @@ function left_check(left, right, chained = false) {
         return false;
     }
     return true;
+}
+
+function chain_check(left, right) {
+
+// Warn if the left is a path containing an optional accessor.
+
+    if (left.id === "?.") {
+        return warn("unexpected_a", right);
+    }
+    if (
+        left.arity === "binary"
+        && (
+            left.id === "."
+            || left.id === "?."
+            || left.id === "["
+        )
+    ) {
+        return chain_check(left.expression, right);
+    }
 }
 
 // These functions are used to specify the grammar of our language:
@@ -2576,6 +2595,7 @@ infix("(", 160, function (left) {
     let the_argument;
     if (left.id !== "function") {
         left_check(left, the_paren);
+        chain_check(left, the_paren);
     }
     if (functionage.arity === "statement" && left.identifier) {
         functionage.name.calls[left.id] = left;
@@ -2654,7 +2674,8 @@ infix(".", 170, function (left) {
 infix("?.", 170, function (left) {
     const the_token = token;
     const name = next_token;
-    left_check(left, the_token, true);
+    left_check(left, the_token);
+    chain_check(left, the_token);
     if (!name.identifier) {
         stop("expected_identifier_a");
     }
