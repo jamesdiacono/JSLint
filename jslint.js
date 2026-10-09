@@ -1,5 +1,5 @@
 // jslint.js
-// 2026-02-09
+// 2026-09-29
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -182,7 +182,7 @@ const allowed_option = {
     bitwise: true,
     browser: web.concat([
         "addEventListener", "AudioContext", "caches", "cancelAnimationFrame",
-        "CharacterData", "customElements", "document", "DocumentType",
+        "CharacterData", "CSS", "customElements", "document", "DocumentType",
         "DOMParser", "Element", "FileReader", "FontFace", "getComputedStyle",
         "history", "indexedDB", "IntersectionObserver", "isSecureContext",
         "localStorage", "location", "matchMedia", "MediaRecorder",
